@@ -554,7 +554,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             <div className="soft-card px-5 py-4">
               <div className="text-[14px] font-bold text-[#3d4350]">Новых за сегодня</div>
               <div className="mt-2 flex items-end justify-between">
-                <div className="text-[44px] leading-8 font-extrabold text-[#1d202c]">{newTodayCount}</div>
+                <div className="text-[34px] leading-[1.05] font-extrabold text-[#1d202c]">{newTodayCount}</div>
                 <div className="text-[12px] text-[#6b7280]">+11.7%</div>
               </div>
             </div>
@@ -562,7 +562,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             <div className="soft-card px-5 py-4">
               <div className="text-[14px] font-bold text-[#3d4350]">Тендеры в канбане</div>
               <div className="mt-2 flex items-end justify-between gap-2">
-                <div className="text-[44px] leading-8 font-extrabold text-[#1d202c]">{kanbanRows.length}</div>
+                <div className="text-[34px] leading-[1.05] font-extrabold text-[#1d202c]">{kanbanRows.length}</div>
                 <div className="text-right text-[12px] leading-4 text-[#6b7280]">{kanbanNotInWork} из них не в работе</div>
               </div>
             </div>
@@ -570,7 +570,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             <div className="soft-card px-5 py-4">
               <div className="text-[14px] font-bold text-[#3d4350]">Срок подачи &lt;5 дней</div>
               <div className="mt-2 flex items-end justify-between gap-2">
-                <div className="text-[44px] leading-8 font-extrabold text-[#1d202c]">{urgentCount}</div>
+                <div className="text-[34px] leading-[1.05] font-extrabold text-[#1d202c]">{urgentCount}</div>
                 <div className="text-right text-[12px] leading-4 text-[#ef4d1f]">требуют действий!</div>
               </div>
             </div>
@@ -578,7 +578,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             <div className="soft-card px-5 py-4">
               <div className="text-[14px] font-bold text-[#3d4350]">Сумма в работе</div>
               <div className="mt-2 flex items-end justify-between">
-                <div className="text-[44px] leading-8 font-extrabold text-[#1d202c]">{formatPriceCompact(inWorkAmount)}</div>
+                <div className="text-[34px] leading-[1.05] font-extrabold text-[#1d202c]">{formatPriceCompact(inWorkAmount)}</div>
                 <div className="text-[12px] text-[#6b7280]">+8.01%</div>
               </div>
             </div>
