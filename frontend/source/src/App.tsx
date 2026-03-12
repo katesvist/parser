@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Wrench, Send, MessageCircleMore, LogOut } from 'lucide-react';
 import { LoginPage } from './components/LoginPage';
 import { Dashboard } from './components/Dashboard';
 import { TenderSearch } from './components/TenderSearch';
@@ -15,6 +16,12 @@ import { apiRequest } from './lib/api';
 
 type Page = 'login' | 'dashboard' | 'search' | 'details' | 'kanban' | 'profile' | 'saved-searches' | 'favorites';
 
+function extractFirstName(fullName: string) {
+  const normalized = (fullName || '').trim();
+  if (!normalized) return 'Пользователь';
+  return normalized.split(/\s+/)[0] || normalized;
+}
+
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authReady, setAuthReady] = useState(false);
@@ -24,6 +31,8 @@ export default function App() {
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   const [onboardingLoading, setOnboardingLoading] = useState(false);
   const [onboardingInitial, setOnboardingInitial] = useState<OnboardingProfile>({});
+
+  const firstName = useMemo(() => extractFirstName(profileName), [profileName]);
 
   const readPageFromUrl = () => {
     const params = new URLSearchParams(window.location.search);
@@ -167,7 +176,7 @@ export default function App() {
 
   if (!authReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
         Загрузка...
       </div>
     );
@@ -178,7 +187,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen text-foreground">
+    <div className="md:flex md:min-h-screen">
       <Header
         onNavigate={handleNavigate}
         onLogout={handleLogout}
@@ -186,11 +195,43 @@ export default function App() {
         userName={profileName}
       />
 
-      <main className="py-10">
-        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          <PageSection className="w-full">{renderPageContent()}</PageSection>
+      <div className="min-w-0 flex-1 px-4 pb-6 pt-4 md:px-5 md:pb-8 md:pt-6">
+        <div className="mb-5 flex flex-col gap-3 md:mb-6 md:flex-row md:items-center md:justify-between">
+          <h1 className="text-[24px] font-bold tracking-[-0.02em] text-[#1d202c] md:text-[28px]">
+            Здравствуйте, <span className="text-[#ef4d1f]">{firstName}</span>!
+          </h1>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleNavigate('profile')}
+              className="inline-flex h-10 items-center gap-2 rounded-2xl border border-[#c8d0db] bg-white px-4 text-[14px] text-[#464d58]"
+            >
+              <Wrench className="h-4 w-4" />
+              Настройки аккаунта
+            </button>
+            <button type="button" className="social-btn social-btn--vk" aria-label="VK">
+              vk
+            </button>
+            <button type="button" className="social-btn social-btn--tg" aria-label="Telegram">
+              <Send className="h-4 w-4" />
+            </button>
+            <button type="button" className="social-btn social-btn--chat" aria-label="Chat">
+              <MessageCircleMore className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex h-10 items-center gap-2 rounded-2xl border border-[#d0d6df] bg-white px-4 text-[14px] text-[#525b67] hover:bg-[#f7f9fc]"
+            >
+              <LogOut className="h-4 w-4" />
+              Выйти
+            </button>
+          </div>
         </div>
-      </main>
+
+        <PageSection className="w-full">{renderPageContent()}</PageSection>
+      </div>
 
       <OnboardingModal
         open={onboardingOpen}
@@ -206,7 +247,7 @@ export default function App() {
               body: JSON.stringify({ ...payload, is_onboarded: true }),
             });
             setOnboardingOpen(false);
-          } catch (err) {
+          } catch {
             window.alert('Не удалось сохранить данные организации.');
           } finally {
             setOnboardingLoading(false);

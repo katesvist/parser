@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
@@ -10,8 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { Star, Trash2, Eye, Calendar, Download } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { Star, Trash2, Calendar, Download, CircleDot } from 'lucide-react';
 import { useTenders } from '../context/TendersContext';
 import { downloadJson } from '../utils/download';
 import {
@@ -29,6 +27,16 @@ interface FavoritesProps {
   onNavigate: (page: 'details' | 'search', tenderId?: string) => void;
 }
 
+function kanbanHint(status?: string) {
+  const value = (status || '').toLowerCase();
+  if (!value) return { text: 'Не в работе', color: '#e29a57' };
+  if (value.includes('done') || value.includes('заверш')) return { text: 'Завершено', color: '#5f88d2' };
+  if (value.includes('in_progress') || value.includes('docs') || value.includes('review')) {
+    return { text: 'В канбане', color: '#31b06b' };
+  }
+  return { text: 'В канбане', color: '#31b06b' };
+}
+
 export function Favorites({ onNavigate }: FavoritesProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('Все статусы');
@@ -37,6 +45,8 @@ export function Favorites({ onNavigate }: FavoritesProps) {
   const [favoritesError, setFavoritesError] = useState<string | null>(null);
   const [favoriteDetails, setFavoriteDetails] = useState<Record<string, Tender>>({});
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [kanbanMap, setKanbanMap] = useState<Record<string, string>>({});
+
   const { tenders, loading, error } = useTenders();
 
   const loadFavorites = useCallback(async () => {
@@ -44,7 +54,7 @@ export function Favorites({ onNavigate }: FavoritesProps) {
       const data = await apiRequest<{ object_number: string }[]>('favorites');
       setFavorites(new Set((data || []).map((row) => row.object_number)));
       setFavoritesError(null);
-    } catch (err) {
+    } catch {
       setFavoritesError('Не удалось загрузить избранное.');
     } finally {
       setFavoritesLoading(false);
@@ -54,6 +64,28 @@ export function Favorites({ onNavigate }: FavoritesProps) {
   useEffect(() => {
     void loadFavorites();
   }, [loadFavorites]);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadKanban = async () => {
+      try {
+        const data = await apiRequest<Array<{ object_number: string; status: string }>>('kanban');
+        if (!mounted) return;
+        const next: Record<string, string> = {};
+        (data || []).forEach((row) => {
+          if (row?.object_number && row?.status) next[row.object_number] = row.status;
+        });
+        setKanbanMap(next);
+      } catch {
+        if (!mounted) return;
+        setKanbanMap({});
+      }
+    };
+    void loadKanban();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const tendersByObjectNumber = useMemo(() => {
     const map: Record<string, Tender> = {};
@@ -96,16 +128,13 @@ export function Favorites({ onNavigate }: FavoritesProps) {
     return () => {
       active = false;
     };
-  }, [favorites, tendersByObjectNumber]);
+  }, [favorites, tendersByObjectNumber, favoriteDetails]);
 
   const toggleFavorite = async (id: string) => {
     const next = new Set(favorites);
     const wasFavorite = next.has(id);
-    if (wasFavorite) {
-      next.delete(id);
-    } else {
-      next.add(id);
-    }
+    if (wasFavorite) next.delete(id);
+    else next.add(id);
     setFavorites(next);
 
     try {
@@ -145,9 +174,7 @@ export function Favorites({ onNavigate }: FavoritesProps) {
     return favoriteTenders.filter((tender) => {
       if (statusFilter !== 'Все статусы') {
         const currentStatus = tender.etap_zakupki?.toLowerCase() ?? '';
-        if (!currentStatus.includes(statusFilter.toLowerCase())) {
-          return false;
-        }
+        if (!currentStatus.includes(statusFilter.toLowerCase())) return false;
       }
 
       if (!query) return true;
@@ -178,186 +205,133 @@ export function Favorites({ onNavigate }: FavoritesProps) {
   }, [filteredFavorites]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1>Избранные тендеры</h1>
-        <p className="text-muted-foreground mt-1">
-          Тендеры, которые вы добавили в избранное для отслеживания
-        </p>
-      </div>
-
-      <Card>
-        <CardContent className="py-4">
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Поиск в избранном..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-md"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Все статусы" />
-              </SelectTrigger>
-              <SelectContent>
-                {statuses.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button type="button" variant="outline" className="gap-2" onClick={handleExportFavorites}>
-              <Download className="w-4 h-4" />
-              Экспорт
-            </Button>
+    <div className="space-y-4">
+      <section className="surface-card p-4 md:p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-[24px] leading-7 font-extrabold text-[#303744]">Избранные тендеры</h2>
+          <div className="text-[14px] text-[#6f7783]">
+            Всего: <span className="font-bold text-[#2f3643]">{favoriteTenders.length}</span> тендеров
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {(error || favoritesError) && (
-        <Alert className="border-orange-300 bg-orange-50 text-orange-700">
-          <AlertTitle>Показаны сохраненные данные</AlertTitle>
-          <AlertDescription>{favoritesError || error}</AlertDescription>
-        </Alert>
-      )}
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <Input
+            placeholder="Поиск в избранном..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-11 min-w-[240px] max-w-[460px] rounded-[10px] border-[#d8dee6] bg-white text-[14px]"
+          />
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="h-11 w-[240px] rounded-[10px] border-[#d8dee6] bg-white text-[14px]">
+              <SelectValue placeholder="Все статусы" />
+            </SelectTrigger>
+            <SelectContent>
+              {statuses.map((status) => (
+                <SelectItem key={status} value={status}>{status}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button type="button" variant="outline" className="h-11 rounded-[10px] border-[#d8dee6] px-4 text-[14px]" onClick={handleExportFavorites}>
+            <Download className="mr-2 h-4 w-4" />
+            Экспорт
+          </Button>
+        </div>
 
-      {loading || favoritesLoading || detailsLoading ? (
-        <Card>
-          <CardContent className="p-12 text-center text-muted-foreground">
+        {(error || favoritesError) && (
+          <div className="mb-3 rounded-[10px] border border-[#f4b08a] bg-[#fff4eb] px-3 py-2 text-[14px] text-[#b35b2b]">
+            {favoritesError || error}
+          </div>
+        )}
+
+        {loading || favoritesLoading || detailsLoading ? (
+          <div className="rounded-[10px] border border-[#e1e6ee] bg-[#f7f9fc] px-3 py-4 text-[14px] text-[#7f8794]">
             Загружаем ваши избранные тендеры…
-          </CardContent>
-        </Card>
-      ) : filteredFavorites.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Всего тендеров: {favoriteTenders.length}</CardTitle>
-              {favoriteTenders.length !== filteredFavorites.length && (
-                <span className="text-sm text-muted-foreground">
-                  Отфильтровано: {filteredFavorites.length}
-                </span>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredFavorites.map((tender) => {
-                const statusInfo = getStatusInfo(tender.etap_zakupki);
-                return (
-                  <Card
-                    key={tender.object_number}
-                    className="group cursor-pointer border-border/70 bg-white/80 transition-all hover:shadow-[0_16px_40px_-32px_rgba(15,23,42,0.35)]"
+          </div>
+        ) : filteredFavorites.length > 0 ? (
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {filteredFavorites.map((tender) => {
+              const statusInfo = getStatusInfo(tender.etap_zakupki);
+              const workState = kanbanHint(kanbanMap[tender.object_number]);
+              return (
+                <article
+                  key={tender.object_number}
+                  className="rounded-[12px] border border-[#dde2ea] bg-white p-3 transition hover:bg-[#f8fbff]"
+                >
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <div className="inline-flex items-center gap-1 text-[12px] text-[#7a8390]">
+                      <CircleDot className="h-3.5 w-3.5" style={{ color: workState.color }} />
+                      {workState.text}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleFavorite(tender.object_number)}
+                      className="rounded-[8px] p-1 text-[#ea6f76] hover:bg-[#fff1f3]"
+                      aria-label="Удалить из избранного"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <Badge className="rounded-[5px] bg-[#3e4556] px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-[#3e4556]">
+                      {tender.zakon || '—'}
+                    </Badge>
+                    <span className="rounded-[5px] bg-[#d7f2e2] px-2 py-0.5 text-[12px] font-bold text-[#20814f]">{statusInfo.label}</span>
+                    <span className="text-[16px] text-[#9aa0ab]">{decodeHtmlEntities(tender.etp_name || '').replace(/^АО /, '').replace(/^ООО /, '') || '—'}</span>
+                  </div>
+
+                  <button
+                    type="button"
                     onClick={() => onNavigate('details', tender.object_number)}
+                    className="w-full text-left"
                   >
-                    <CardContent className="p-5 space-y-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <div className="text-xs text-muted-foreground">№ {tender.object_number}</div>
-                          <div className="text-sm font-semibold leading-snug line-clamp-2">
-                            {getTenderDisplayTitle(tender)}
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleFavorite(tender.object_number);
-                          }}
-                        >
-                          <Star
-                            className={`w-4 h-4 ${
-                              favorites.has(tender.object_number)
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-muted-foreground'
-                            }`}
-                          />
-                        </Button>
-                      </div>
+                    <h3 className="line-clamp-2 text-[14px] font-semibold leading-5 text-[#2d3442]">{getTenderDisplayTitle(tender)}</h3>
+                  </button>
 
-                      <div className="flex flex-wrap items-center gap-2">
-                        {tender.zakon && (
-                          <Badge variant="outline" className="text-xs">
-                            {tender.zakon}
-                          </Badge>
-                        )}
-                        <Badge variant="secondary" className={statusInfo.color}>
-                          {statusInfo.label}
-                        </Badge>
-                        {tender.okpd2info && (
-                          <Badge variant="outline" className="text-xs">
-                            {decodeHtmlEntities(tender.okpd2info.split(' - ')[0])}
-                          </Badge>
-                        )}
-                      </div>
+                  <div className="mt-1 text-[14px] text-[#2f3643]">{decodeHtmlEntities(tender.shortname || tender.fullname || '—')}</div>
+                  <div className="line-clamp-1 text-[14px] text-[#9aa0ab]">{decodeHtmlEntities(((tender as any).region_name || (tender as any).region || '').toString()) || '—'}</div>
 
-                      <div className="space-y-1 text-sm">
-                        <div className="text-muted-foreground">
-                          {decodeHtmlEntities(tender.shortname || tender.fullname || '—')}
-                        </div>
-                        {tender.inn && (
-                          <div className="text-muted-foreground">ИНН: {tender.inn}</div>
-                        )}
-                      </div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <div className="text-[24px] font-extrabold leading-7 text-[#2da36b]">
+                      {formatCurrency(tender.maxprice, tender.currency_code).replace(' RUB', '')}
+                    </div>
+                    <div className="inline-flex items-center gap-1 text-[12px] text-[#2f3643]">
+                      <Calendar className="h-3.5 w-3.5 text-[#8c94a1]" />
+                      {formatDate(tender.enddt)} г.
+                    </div>
+                  </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="text-emerald-600 font-semibold">
-                          {formatCurrency(tender.maxprice, tender.currency_code)}
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Calendar className="w-3 h-3" />
-                          <span>{formatDate(tender.enddt)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2 border-t border-border/70">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="gap-2"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onNavigate('details', tender.object_number);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                          Открыть
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleFavorite(tender.object_number);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="p-12">
-          <div className="text-center">
-            <Star className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="mb-2">Нет избранных тендеров</h3>
-            <p className="text-muted-foreground mb-4">
-              Добавляйте интересующие вас тендеры в избранное для быстрого доступа
-            </p>
-            <Button onClick={() => onNavigate('search')}>
+                  <div className="mt-2 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => onNavigate('details', tender.object_number)}
+                      className="text-[12px] font-semibold text-[#3b6fc8] hover:text-[#2e5ca7]"
+                    >
+                      Открыть
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleFavorite(tender.object_number)}
+                      className="rounded-[8px] border border-[#d9dee7] p-1.5 text-[#7f8895] hover:bg-[#f4f7fb]"
+                    >
+                      <Star className={`h-4 w-4 ${favorites.has(tender.object_number) ? 'fill-[#2da36b] text-[#2da36b]' : ''}`} />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="rounded-[10px] border border-[#e1e6ee] bg-[#f7f9fc] px-3 py-4 text-center">
+            <Star className="mx-auto mb-2 h-9 w-9 text-[#8f96a2]" />
+            <h3 className="text-[20px] font-bold text-[#303744]">Нет избранных тендеров</h3>
+            <p className="mt-1 text-[14px] text-[#7f8794]">Добавляйте интересующие тендеры в избранное для быстрого доступа</p>
+            <Button type="button" className="mt-3 h-11 rounded-full bg-[#2da36b] px-6 text-[14px] font-bold text-white hover:bg-[#248e5c]" onClick={() => onNavigate('search')}>
               Найти тендеры
             </Button>
           </div>
-        </Card>
-      )}
+        )}
+      </section>
     </div>
   );
 }

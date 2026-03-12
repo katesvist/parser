@@ -1,5 +1,4 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -12,27 +11,24 @@ import {
 } from './ui/select';
 import { Badge } from './ui/badge';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from './ui/table';
-import { 
-  Search, 
-  Filter, 
-  Star, 
-  Download, 
-  Eye,
+  Search,
+  Filter,
+  Star,
+  Download,
   Calendar,
   ChevronDown,
   Bookmark,
-  Globe,
   RotateCcw,
 } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
-import { formatCurrency, formatDate, getStatusInfo, decodeHtmlEntities, getTenderDisplayTitle, type Tender } from '../types/tender';
+import { Collapsible, CollapsibleContent } from './ui/collapsible';
+import {
+  formatCurrency,
+  formatDate,
+  getStatusInfo,
+  decodeHtmlEntities,
+  getTenderDisplayTitle,
+  type Tender,
+} from '../types/tender';
 import { downloadJson } from '../utils/download';
 import { apiRequest } from '../lib/api';
 import { normalizeSavedSearchFilters } from '../lib/saved-search-filters';
@@ -71,9 +67,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
     const uniqueStatuses = new Set<string>();
     uniqueStatuses.add('Все статусы');
     results.forEach((tender) => {
-      if (tender.etap_zakupki) {
-        uniqueStatuses.add(tender.etap_zakupki);
-      }
+      if (tender.etap_zakupki) uniqueStatuses.add(tender.etap_zakupki);
     });
     return Array.from(uniqueStatuses);
   }, [results]);
@@ -82,27 +76,19 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
     const uniqueMethods = new Set<string>();
     uniqueMethods.add('Все способы');
     results.forEach((tender) => {
-      if (tender.placingway_name) {
-        uniqueMethods.add(tender.placingway_name);
-      }
+      if (tender.placingway_name) uniqueMethods.add(tender.placingway_name);
     });
     return Array.from(uniqueMethods);
   }, [results]);
 
-  const laws = [
-    'Все законы',
-    '44-ФЗ',
-    '223-ФЗ',
-  ];
+  const laws = ['Все законы', '44-ФЗ', '223-ФЗ'];
 
   useEffect(() => {
     setSearchInput(searchQuery);
   }, [searchQuery]);
 
   useEffect(() => {
-    if (searchInput === '' && searchQuery !== '') {
-      setSearchQuery('');
-    }
+    if (searchInput === '' && searchQuery !== '') setSearchQuery('');
   }, [searchInput, searchQuery]);
 
   useEffect(() => {
@@ -132,9 +118,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
 
   useEffect(() => {
     return () => {
-      if (searchFeedbackTimeout.current) {
-        window.clearTimeout(searchFeedbackTimeout.current);
-      }
+      if (searchFeedbackTimeout.current) window.clearTimeout(searchFeedbackTimeout.current);
     };
   }, []);
 
@@ -143,32 +127,23 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
     const loadFavorites = async () => {
       try {
         const data = await apiRequest<{ object_number: string }[]>('favorites');
-        if (isMounted) {
-          setFavorites(new Set((data || []).map((row) => row.object_number)));
-        }
+        if (isMounted) setFavorites(new Set((data || []).map((row) => row.object_number)));
       } catch (err) {
         console.warn('Failed to load favorites', err);
       } finally {
-        if (isMounted) {
-          setFavoritesLoaded(true);
-        }
+        if (isMounted) setFavoritesLoaded(true);
       }
     };
-    loadFavorites();
+    void loadFavorites();
     return () => {
       isMounted = false;
     };
   }, []);
 
   const runSearch = useCallback(() => {
-    if (searchFeedbackTimeout.current) {
-      window.clearTimeout(searchFeedbackTimeout.current);
-    }
+    if (searchFeedbackTimeout.current) window.clearTimeout(searchFeedbackTimeout.current);
     setSearchAnimating(true);
-    searchFeedbackTimeout.current = window.setTimeout(() => {
-      setSearchAnimating(false);
-    }, 200);
-
+    searchFeedbackTimeout.current = window.setTimeout(() => setSearchAnimating(false), 200);
     setSearchQuery(searchInput.trim());
   }, [searchInput]);
 
@@ -199,17 +174,14 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
       event.preventDefault();
       runSearch();
     },
-    [runSearch]
+    [runSearch],
   );
 
   const toggleFavorite = async (id: string) => {
     const next = new Set(favorites);
     const wasFavorite = next.has(id);
-    if (wasFavorite) {
-      next.delete(id);
-    } else {
-      next.add(id);
-    }
+    if (wasFavorite) next.delete(id);
+    else next.add(id);
     setFavorites(next);
 
     try {
@@ -276,6 +248,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
 
   const totalPages = Math.max(1, Math.ceil(resultsTotal / PAGE_SIZE));
   const paginatedTenders = results;
+
   const paginationTokens = useMemo(() => {
     if (totalPages <= 1) return [1] as Array<number | 'ellipsis'>;
 
@@ -283,29 +256,26 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
     pages.add(1);
     pages.add(totalPages);
 
-    let start = Math.max(2, currentPage - 1);
-    let end = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = 2; i <= Math.min(10, totalPages - 1); i += 1) pages.add(i);
 
-    if (currentPage <= 2) {
-      start = 2;
-      end = Math.min(totalPages - 1, 3);
-    } else if (currentPage >= totalPages - 1) {
-      start = Math.max(2, totalPages - 2);
-      end = totalPages - 1;
+    if (totalPages > 10) {
+      const pivot = Math.max(15, Math.floor((currentPage - 1) / 5) * 5 + 5);
+      for (let p = pivot; p <= Math.min(totalPages - 1, pivot + 20); p += 5) {
+        pages.add(p);
+      }
     }
 
-    for (let p = start; p <= end; p += 1) {
-      pages.add(p);
-    }
+    pages.add(currentPage);
 
-    const sorted = Array.from(pages).sort((a, b) => a - b);
+    const sorted = Array.from(pages)
+      .filter((page) => page >= 1 && page <= totalPages)
+      .sort((a, b) => a - b);
+
     const tokens: Array<number | 'ellipsis'> = [];
     for (let i = 0; i < sorted.length; i += 1) {
       const page = sorted[i];
       const prev = sorted[i - 1];
-      if (prev !== undefined && page - prev > 1) {
-        tokens.push('ellipsis');
-      }
+      if (prev !== undefined && page - prev > 1) tokens.push('ellipsis');
       tokens.push(page);
     }
     return tokens;
@@ -329,9 +299,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
   ]);
 
   useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
+    if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [currentPage, totalPages]);
 
   useEffect(() => {
@@ -362,7 +330,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
         setResults(items);
         const totalValue = typeof data?.total === 'number' ? data.total : items.length;
         setResultsTotal(totalValue);
-      } catch (err) {
+      } catch {
         if (!isMounted) return;
         setResultsError('Не удалось загрузить тендеры.');
         setResults([]);
@@ -371,7 +339,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
         if (isMounted) setResultsLoading(false);
       }
     };
-    loadResults();
+    void loadResults();
     return () => {
       isMounted = false;
     };
@@ -401,385 +369,263 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
   }, [results]);
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h1>Поиск тендеров</h1>
-        <p className="text-muted-foreground">
-          Поиск и фильтрация тендеров с zakupki.gov.ru
-        </p>
-      </div>
+    <div className="space-y-4">
+      <section className="surface-card p-4 md:p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-[24px] leading-7 font-extrabold text-[#303744]">Параметры поиска</h2>
+          <button
+            type="button"
+            onClick={() => setIsFilterOpen((prev) => !prev)}
+            className="inline-flex items-center gap-2 text-[14px] font-semibold text-[#3f4652]"
+          >
+            <Filter className="h-4 w-4" />
+            Фильтры
+            <ChevronDown className={`h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
 
-      <Card className="bg-white/80 border-border/70">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-medium">Параметры поиска</CardTitle>
+        <form className="mb-3 flex flex-wrap gap-2" onSubmit={handleSearchSubmit}>
+          <div className="min-w-[240px] flex-1">
+            <Input
+              placeholder="Поиск по ключевым словам..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="h-11 rounded-[10px] border-[#d8dee6] bg-white text-[18px]"
+              enterKeyHint="search"
+            />
+          </div>
+          <Button
+            type="button"
+            className={`h-11 rounded-[10px] bg-[#2da36b] px-5 text-[14px] font-bold text-white hover:bg-[#248e5c] ${searchAnimating ? 'scale-[0.99]' : ''}`}
+            onClick={runSearch}
+          >
+            <Search className="mr-2 h-4 w-4" />
+            Найти
+          </Button>
+          <Button type="button" variant="outline" className="h-11 rounded-[10px] border-[#d8dee6] px-4 text-[14px] text-[#2f3542]" onClick={saveSearch}>
+            <Bookmark className="mr-2 h-4 w-4" />
+            Сохранить поиск
+          </Button>
+          <Button type="button" variant="outline" className="h-11 rounded-[10px] border-[#d8dee6] px-4 text-[14px] text-[#2f3542]" onClick={resetFilters}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Сбросить поиск
+          </Button>
+        </form>
+
+        <Collapsible open={isFilterOpen}>
+          <CollapsibleContent>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">Закон</Label>
+                <Select value={lawFilter} onValueChange={setLawFilter}>
+                  <SelectTrigger className="h-11 rounded-[10px] border-[#d8dee6] bg-white"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {laws.map((law) => (
+                      <SelectItem key={law} value={law}>{law}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">Способ закупки</Label>
+                <Select value={methodFilter} onValueChange={setMethodFilter}>
+                  <SelectTrigger className="h-11 rounded-[10px] border-[#d8dee6] bg-white"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {purchaseMethods.map((method) => (
+                      <SelectItem key={method} value={method}>{method}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">Дата публикации от</Label>
+                <Input type="date" value={startDateFrom} onChange={(e) => setStartDateFrom(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">Цена от (₽)</Label>
+                <Input type="number" placeholder="0" value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">Цена до (₽)</Label>
+                <Input type="number" placeholder="0" value={priceTo} onChange={(e) => setPriceTo(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">ОКПД</Label>
+                <Input placeholder="Например, 20.41" value={okpd2Filter} onChange={(e) => setOkpd2Filter(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">Номер закупки</Label>
+                <Input placeholder="Например, 0123200000326000116" value={objectNumberFilter} onChange={(e) => setObjectNumberFilter(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">ИНН заказчика</Label>
+                <Input placeholder="Например, 7701234567" value={innFilter} onChange={(e) => setInnFilter(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">ИКЗ</Label>
+                <Input value={ikzFilter} onChange={(e) => setIkzFilter(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">Финальная дата подачи заявок</Label>
+                <Input type="date" value={endDateTo} onChange={(e) => setEndDateTo(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[16px] text-[#3f4652]">Этап закупки</Label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="h-11 rounded-[10px] border-[#d8dee6] bg-white"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {statuses.map((status) => (
+                      <SelectItem key={status} value={status}>{status}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </section>
+
+      <section className="surface-card p-4 md:p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-[24px] leading-7 font-extrabold text-[#303744]">Результаты поиска</h2>
+          <div className="flex items-center gap-4 text-[14px] text-[#6f7783]">
+            <span>
+              Найдено: <span className="font-bold text-[#232a37]">{resultsTotal}</span> тендеров
+            </span>
+            <Button type="button" variant="outline" className="h-10 rounded-[10px] border-[#d8dee6] px-4 text-[14px]" onClick={handleExportResults}>
+              <Download className="mr-2 h-4 w-4" />
+              Экспорт
+            </Button>
+          </div>
+        </div>
+
+        {resultsError ? <div className="mb-2 rounded-[10px] bg-[#fff4eb] px-3 py-2 text-[14px] text-[#bb5a2c]">{resultsError}</div> : null}
+        {resultsLoading ? <div className="mb-2 rounded-[10px] bg-[#f5f7fb] px-3 py-2 text-[14px] text-[#7a8390]">Загружаем данные...</div> : null}
+
+        <div className="space-y-2">
+          {paginatedTenders.map((tender) => {
+            const statusInfo = getStatusInfo(tender.etap_zakupki);
+            const organization = decodeHtmlEntities(tender.shortname || tender.fullname || '—');
+            const region = decodeHtmlEntities(((tender as any).region_name || (tender as any).region || '').toString());
+            return (
+              <article
+                key={tender.object_number}
+                className="rounded-[12px] border border-[#dde2ea] bg-white p-3 transition hover:bg-[#f8fbff]"
+              >
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0 flex-1 cursor-pointer" onClick={() => onNavigate('details', tender.object_number)}>
+                    <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                      <Badge className="rounded-[5px] bg-[#3e4556] px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-[#3e4556]">
+                        {tender.zakon || '—'}
+                      </Badge>
+                      <span className="rounded-[5px] bg-[#d7f2e2] px-2 py-0.5 text-[12px] font-bold text-[#20814f]">{statusInfo.label}</span>
+                      <span className="text-[16px] text-[#9aa0ab]">{decodeHtmlEntities(tender.etp_name || '').replace(/^АО /, '').replace(/^ООО /, '') || '—'}</span>
+                    </div>
+                    <h3 className="line-clamp-2 text-[16px] leading-5 text-[#2d3442]">{getTenderDisplayTitle(tender)}</h3>
+                    <div className="mt-1 text-[14px] text-[#7f8794]">{decodeHtmlEntities(tender.placingway_name || '—')}</div>
+                    <div className="mt-1 text-[24px] font-extrabold leading-7 text-[#2da36b]">
+                      {formatCurrency(tender.maxprice, tender.currency_code).replace(' RUB', '')}
+                    </div>
+                  </div>
+
+                  <div className="flex min-w-[230px] flex-row items-end justify-between gap-3 lg:block">
+                    <button
+                      type="button"
+                      className="rounded-[8px] border border-[#d9dee7] p-1.5 text-[#7f8895] hover:bg-[#f4f7fb]"
+                      disabled={!favoritesLoaded}
+                      onClick={() => toggleFavorite(tender.object_number)}
+                    >
+                      <Star className={`h-4 w-4 ${favorites.has(tender.object_number) ? 'fill-[#2da36b] text-[#2da36b]' : ''}`} />
+                    </button>
+                    <div className="mt-2 text-right lg:text-left">
+                      <div className="line-clamp-1 text-[14px] text-[#2f3643]">{organization}</div>
+                      <div className="line-clamp-1 text-[14px] text-[#9aa0ab]">{region || '—'}</div>
+                      <div className="mt-1 inline-flex items-center gap-1 text-[12px] text-[#2f3643]">
+                        <Calendar className="h-3.5 w-3.5 text-[#8c94a1]" />
+                        {formatDate(tender.enddt)} г.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+
+          {!resultsLoading && paginatedTenders.length === 0 ? (
+            <div className="rounded-[10px] border border-[#e1e6ee] bg-[#f7f9fc] px-3 py-4 text-[14px] text-[#7f8794]">
+              Ничего не найдено. Измените параметры поиска.
+            </div>
+          ) : null}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#e1e6ee] pt-3 text-[14px] text-[#6f7783]">
+          <span>
+            Показано {paginatedTenders.length} из {resultsTotal} • по {PAGE_SIZE} на странице
+          </span>
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="h-8 gap-2"
+              className="h-9 rounded-full border-[#d5dbe5] px-4"
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
             >
-              <Filter className="w-4 h-4" />
-              Фильтры
-              <ChevronDown className={`w-4 h-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+              Назад
             </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            <form className="flex flex-wrap gap-2" onSubmit={handleSearchSubmit}>
-              <div className="flex-1 min-w-[220px]">
-                <div className="relative">
-                  <Input
-                    placeholder="Поиск по ключевым словам или номеру закупки..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    className="pl-3 text-sm"
-                    enterKeyHint="search"
-                  />
-                </div>
-              </div>
-              <Button
-                type="button"
-                className={`h-10 gap-2 px-5 transform transition-transform duration-200 ease-out active:scale-95 ${searchAnimating ? 'scale-95' : ''}`}
-                onClick={runSearch}
-              >
-                <Search className="w-4 h-4" />
-                Найти
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 gap-2 px-4"
-                onClick={saveSearch}
-              >
-                <Bookmark className="w-4 h-4" />
-                Сохранить поиск
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 gap-2 px-4"
-                onClick={resetFilters}
-              >
-                <RotateCcw className="w-4 h-4" />
-                Сбросить
-              </Button>
-            </form>
+            <div className="flex items-center gap-1 overflow-x-auto pb-1">
+              {paginationTokens.map((token, index) => {
+                if (token === 'ellipsis') {
+                  return (
+                    <span key={`ellipsis-${index}`} className="px-1 text-[14px] text-[#8f96a2]">
+                      …
+                    </span>
+                  );
+                }
 
-            <Collapsible open={isFilterOpen}>
-              <CollapsibleContent>
-                <div className="mt-4 rounded-2xl border border-border/70 bg-muted/60 p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Закон</Label>
-                    <Select value={lawFilter} onValueChange={setLawFilter}>
-                      <SelectTrigger className="h-10">
-                        <SelectValue placeholder="Выберите закон" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {laws.map((law) => (
-                          <SelectItem key={law} value={law}>
-                            {law}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Способ закупки</Label>
-                    <Select value={methodFilter} onValueChange={setMethodFilter}>
-                      <SelectTrigger className="h-10">
-                        <SelectValue placeholder="Выберите способ" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {purchaseMethods.map((method) => (
-                          <SelectItem key={method} value={method}>
-                            {method}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Дата публикации от</Label>
-                    <Input 
-                      type="date" 
-                      value={startDateFrom} 
-                      onChange={(e) => setStartDateFrom(e.target.value)} 
-                      className="h-10"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Цена от (₽)</Label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={priceFrom}
-                      onChange={(e) => setPriceFrom(e.target.value)}
-                      className="h-10"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Цена до (₽)</Label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={priceTo}
-                      onChange={(e) => setPriceTo(e.target.value)}
-                      className="h-10"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">ОКПД</Label>
-                    <Input
-                      placeholder="Например, 20.41 или Наименование ОКПД"
-                      value={okpd2Filter}
-                      onChange={(e) => setOkpd2Filter(e.target.value)}
-                      className="h-10"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Номер закупки</Label>
-                    <Input
-                      placeholder="Например, 0123200000326000116"
-                      value={objectNumberFilter}
-                      onChange={(e) => setObjectNumberFilter(e.target.value)}
-                      className="h-10"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">ИНН заказчика</Label>
-                    <Input
-                      placeholder="Например, 7701234567"
-                      value={innFilter}
-                      onChange={(e) => setInnFilter(e.target.value)}
-                      className="h-10"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">ИКЗ</Label>
-                    <Input
-                      placeholder="Идентификационный код закупки"
-                      value={ikzFilter}
-                      onChange={(e) => setIkzFilter(e.target.value)}
-                      className="h-10"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Финальная дата подачи заявок</Label>
-                    <Input 
-                      type="date" 
-                      value={endDateTo} 
-                      onChange={(e) => setEndDateTo(e.target.value)} 
-                      className="h-10"
-                    />
-                  </div>
-                  </div>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-white/80 border-border/70">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-medium">Результаты поиска</CardTitle>
-            <div className="flex items-center gap-4">
-              <span className="text-base text-muted-foreground">
-                Найдено: <span className="text-foreground">{resultsTotal}</span> тендеров
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-2"
-                type="button"
-                onClick={handleExportResults}
-              >
-                <Download className="w-4 h-4" />
-                Экспорт
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-hidden rounded-b-[20px]">
-            {resultsError && (
-              <div className="border-b border-border/70 px-4 py-3 text-sm text-red-600">
-                {resultsError}
-              </div>
-            )}
-            {resultsLoading && (
-              <div className="border-b border-border/70 px-4 py-3 text-sm text-muted-foreground">
-                Загружаем данные...
-              </div>
-            )}
-            <div className="overflow-x-auto">
-              <Table className="w-full border-collapse table-fixed">
-                <TableHeader>
-                  <TableRow className="border-b border-border/70 bg-muted/60 hover:bg-muted/60">
-                    <TableHead className="w-[430px] px-3 py-3">Наименование</TableHead>
-                    <TableHead className="w-[180px] px-3 py-3">Заказчик</TableHead>
-                    <TableHead className="w-[120px] px-3 py-3">Площадка</TableHead>
-                    <TableHead className="w-[80px] px-3 py-3">Цена</TableHead>
-                    <TableHead className="w-[160px] px-3 py-3">Статус</TableHead>
-                    <TableHead className="w-[110px] px-3 py-3">Срок подачи</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedTenders.map((tender) => {
-                    const statusInfo = getStatusInfo(tender.etap_zakupki);
-                    return (
-                      <TableRow
-                        key={tender.object_number}
-                        className="border-b border-border/60 last:border-0 cursor-pointer hover:bg-accent/60 transition-colors"
-                        onClick={() => onNavigate('details', tender.object_number)}
-                      >
-                        <TableCell className="w-[430px] py-4 px-3 align-top whitespace-normal">
-                          <div className="space-y-2">
-                            <p className="text-sm font-normal text-neutral-950 leading-5 line-clamp-3 break-words">
-                              {getTenderDisplayTitle(tender)}
-                            </p>
-                            <div className="flex items-center gap-2">
-                              <div className="border border-border/70 rounded-full px-[10px] py-[3px] inline-flex items-center justify-center bg-white/80">
-                                <span className="text-[11px] font-semibold text-foreground leading-4 whitespace-nowrap">
-                                  {tender.zakon || '—'}
-                                </span>
-                              </div>
-                              {tender.placingway_name && (
-                                <span className="text-sm text-muted-foreground">
-                                  {decodeHtmlEntities(tender.placingway_name)}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-3 align-middle whitespace-normal">
-                          <div className="space-y-1">
-                            <p className="text-sm text-neutral-950 leading-5 line-clamp-3 break-words">
-                              {decodeHtmlEntities(tender.shortname || tender.fullname) || '—'}
-                            </p>
-                            {tender.inn && (
-                            <p className="text-sm text-muted-foreground leading-5">
-                              ИНН: {tender.inn}
-                            </p>
-                          )}
-                        </div>
-                      </TableCell>
-                        <TableCell className="py-4 px-3 align-middle whitespace-normal">
-                          {tender.etp_name ? (
-                            <div className="flex items-center gap-1 h-full">
-                              <Globe className="w-3 h-3 text-muted-foreground shrink-0" />
-                              <span className="text-xs text-foreground line-clamp-3 break-words" title={tender.etp_name}>
-                                {tender.etp_name.replace(/^АО /, '').replace(/^ООО /, '')}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="py-4 px-3 align-middle">
-                          <div className="text-sm font-semibold text-emerald-600 whitespace-nowrap text-right">
-                            {formatCurrency(tender.maxprice, tender.currency_code).replace(' ₽', '').replace(' RUB', '')}
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-3 align-middle">
-                          <div
-                            className={`inline-flex max-w-full rounded-full px-[10px] py-[4px] items-center justify-center ${statusInfo.color.replace('border', '')}`}
-                          >
-                            <span className="text-[11px] font-semibold leading-4 text-center whitespace-normal break-words [overflow-wrap:anywhere]">
-                              {statusInfo.label}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-3 align-middle">
-                          {tender.enddt ? (
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3 text-muted-foreground shrink-0" />
-                              <span className="text-sm text-foreground whitespace-nowrap">
-                                {formatDate(tender.enddt)} г.
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">—</span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-            <div className="flex items-center justify-between border-t border-border/70 px-4 py-3 text-sm text-muted-foreground">
-              <span>Показано {paginatedTenders.length} из {resultsTotal} • по {PAGE_SIZE} на странице</span>
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8"
-                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                >
-                  Назад
-                </Button>
-                <div className="flex items-center gap-1">
-                  {paginationTokens.map((token, index) => {
-                    if (token === 'ellipsis') {
-                      return (
-                        <span key={`ellipsis-${index}`} className="px-1 text-base text-muted-foreground">
-                          …
-                        </span>
-                      );
+                const page = token;
+                const isActive = page === currentPage;
+                return (
+                  <button
+                    key={page}
+                    type="button"
+                    className={
+                      isActive
+                        ? 'h-10 w-10 rounded-full bg-[#c7d6ef] text-[14px] font-bold text-[#1e4fa2]'
+                        : 'h-10 w-10 rounded-full text-[14px] font-medium text-[#6e7888] hover:bg-[#e8edf5]'
                     }
-
-                    const page = token;
-                    const isActive = page === currentPage;
-                    return (
-                      <button
-                        key={page}
-                        type="button"
-                        className={
-                          isActive
-                            ? 'h-10 w-10 rounded-full bg-slate-200 text-primary text-lg font-semibold'
-                            : 'h-10 w-10 rounded-full text-muted-foreground text-lg font-medium hover:bg-muted/60'
-                        }
-                        onClick={() => setCurrentPage(page)}
-                        disabled={isActive}
-                        aria-current={isActive ? 'page' : undefined}
-                      >
-                        {page}
-                      </button>
-                    );
-                  })}
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8"
-                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  Вперёд
-                </Button>
-                <span className="text-sm text-foreground whitespace-nowrap">
-                  Стр. {currentPage} из {totalPages}
-                </span>
-              </div>
+                    onClick={() => setCurrentPage(page)}
+                    disabled={isActive}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 rounded-full border-[#d5dbe5] px-4"
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Вперёд
+            </Button>
+            <span className="whitespace-nowrap text-[14px] text-[#2f3643]">
+              Стр. {currentPage} из {totalPages}
+            </span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   );
 }

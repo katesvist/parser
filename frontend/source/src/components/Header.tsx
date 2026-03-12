@@ -1,24 +1,16 @@
-import { Button } from './ui/button';
 import { Avatar, AvatarFallback } from './ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { 
-  FileText, 
-  Search, 
-  LayoutDashboard, 
-  Star, 
-  BookmarkCheck, 
-  Columns3,
-  User, 
-  LogOut
-} from 'lucide-react';
 import { cn } from './ui/utils';
+import {
+  LayoutDashboard,
+  Search,
+  Star,
+  Columns3,
+  BookmarkCheck,
+  Users,
+  LineChart,
+  FileText,
+  PlusCircle,
+} from 'lucide-react';
 
 interface HeaderProps {
   onNavigate: (page: 'dashboard' | 'search' | 'kanban' | 'profile' | 'saved-searches' | 'favorites') => void;
@@ -34,86 +26,134 @@ function getInitials(name: string) {
     .filter(Boolean)
     .slice(0, 2);
   if (parts.length === 0) return 'П';
-  return parts
-    .map((part) => part[0]?.toUpperCase() || '')
-    .join('');
+  return parts.map((part) => part[0]?.toUpperCase() || '').join('');
 }
 
-export function Header({ onNavigate, onLogout, currentPage, userName }: HeaderProps) {
-  const navItems = [
-    { id: 'dashboard', label: 'Дашборд', icon: LayoutDashboard },
-    { id: 'search', label: 'Поиск тендеров', icon: Search },
-    { id: 'favorites', label: 'Избранное', icon: Star },
-    { id: 'kanban', label: 'Канбан', icon: Columns3 },
-    { id: 'saved-searches', label: 'Сохраненные поиски', icon: BookmarkCheck },
-  ];
+const navItems = [
+  { id: 'dashboard', label: 'Дашборд', icon: LayoutDashboard },
+  { id: 'search', label: 'Поиск тендеров', icon: Search },
+  { id: 'favorites', label: 'Избранное', icon: Star },
+  { id: 'kanban', label: 'Канбан', icon: Columns3 },
+  { id: 'saved-searches', label: 'Сохраненные поиски', icon: BookmarkCheck },
+  { id: 'team', label: 'Команда', icon: Users, disabled: true },
+] as const;
+
+const moduleItems = [
+  { id: 'market', label: 'Анализ рынка', icon: LineChart },
+  { id: 'docs', label: 'Документы', icon: FileText },
+  { id: 'other', label: 'Еще что-нибудь', icon: PlusCircle },
+] as const;
+
+export function Header({ onNavigate, currentPage, userName }: HeaderProps) {
   const displayName = (userName || '').trim() || 'Пользователь';
   const initials = getInitials(displayName);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-white">
-      <div className="mx-auto flex h-[68px] w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-[0_12px_24px_-16px_rgba(31,60,136,0.6)]">
-              <FileText className="w-5 h-5 text-white" />
+    <>
+      <aside className="hidden w-[223px] shrink-0 flex-col rounded-xl bg-[#cfd6de] p-3 md:flex md:min-h-screen">
+        <div className="mb-5 rounded-xl bg-[#bcc6d2] px-3 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[10px] font-bold text-[#1d202c]">
+              Tender
             </div>
-            <div>
-              <span className="text-[#0b1020] tracking-tight">Тендер.Поиск</span>
-              <p className="text-xs text-muted-foreground">Внутренний стенд</p>
+            <div className="text-[24px] leading-6 font-extrabold tracking-tight text-[#1d202c]">Tender</div>
+          </div>
+        </div>
+
+        <nav className="space-y-0.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentPage === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                disabled={item.disabled}
+                onClick={() => !item.disabled && onNavigate(item.id as any)}
+                className={cn(
+                  'flex h-10 w-full items-center gap-2 rounded-[10px] px-3 text-left text-[14px] transition-colors',
+                  item.disabled
+                    ? 'cursor-not-allowed text-[#7f8896]'
+                    : isActive
+                      ? 'bg-[#ecf0f3] text-[#1d202c]'
+                      : 'text-[#333b47] hover:bg-[#e7ebf1]',
+                )}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="my-5 border-t border-[#9da7b3]" />
+
+        <div className="text-[16px] leading-5 font-bold text-[#333b47]">Модули</div>
+        <div className="mt-3 space-y-1">
+          {moduleItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                disabled
+                className="flex h-9 w-full items-center gap-2 rounded-[10px] px-3 text-left text-[14px] text-[#8f959f]"
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            disabled
+            className="flex h-9 w-full items-center justify-between rounded-[10px] px-3 text-left text-[14px] text-[#333b47]"
+          >
+            <span>Добавить модуль</span>
+            <span>⟲</span>
+          </button>
+        </div>
+
+        <div className="mt-auto rounded-xl bg-[#c6ced8] px-3 py-3">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9 bg-[#ef4d1f] text-white">
+              <AvatarFallback className="bg-[#ef4d1f] text-white">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <div className="truncate text-[16px] leading-5 font-semibold text-[#1d202c]">{displayName}</div>
+              <div className="text-[12px] leading-4 text-[#6f7887]">Free Plan</div>
             </div>
           </div>
+        </div>
+      </aside>
 
-          <nav className="hidden items-center gap-1.5 md:flex">
-            {navItems.map((item) => {
+      <div className="sticky top-0 z-50 border-b border-[#dbe1ea] bg-[#f0f2f7] px-3 py-2 md:hidden">
+        <div className="mb-2 text-[18px] font-extrabold text-[#1d202c]">Tender</div>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {navItems
+            .filter((item) => !item.disabled)
+            .map((item) => {
               const Icon = item.icon;
+              const isActive = currentPage === item.id;
               return (
-                <Button
+                <button
                   key={item.id}
-                  variant="ghost"
+                  type="button"
                   onClick={() => onNavigate(item.id as any)}
-                  aria-current={currentPage === item.id ? 'page' : undefined}
                   className={cn(
-                    'gap-2 rounded-full px-4 text-sm font-medium transition-colors',
-                    currentPage === item.id
-                      ? 'bg-primary text-white shadow-sm hover:bg-primary/90 hover:text-white'
-                      : 'text-muted-foreground hover:text-foreground',
+                    'inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[14px]',
+                    isActive
+                      ? 'border-[#c9d4e0] bg-white text-[#1d202c]'
+                      : 'border-transparent bg-transparent text-[#66707f]',
                   )}
                 >
-                  <Icon className="w-4 h-4" />
-                  {item.label}
-                </Button>
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{item.label}</span>
+                </button>
               );
             })}
-          </nav>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2">
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback>{initials}</AvatarFallback>
-                </Avatar>
-                <span className="hidden md:inline">{displayName}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onNavigate('profile')}>
-                <User className="w-4 h-4 mr-2" />
-                Профиль
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Выйти
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
-    </header>
+    </>
   );
 }
