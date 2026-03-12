@@ -24,3 +24,5 @@
 **/*.log
 **/tmp/
 **/temp/
+**/*.bak_*
+**/*.backup
