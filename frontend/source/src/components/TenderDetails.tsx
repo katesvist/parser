@@ -806,7 +806,7 @@ export function TenderDetails({ tenderId, onNavigate }: TenderDetailsProps) {
           </Card>
 
           {/* Delivery & Security Row */}
-          <div className="flex gap-6">
+          <div className="flex flex-col gap-6 xl:flex-row">
             <Card className="flex-1">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -832,7 +832,7 @@ export function TenderDetails({ tenderId, onNavigate }: TenderDetailsProps) {
               </CardContent>
             </Card>
 
-            <Card className="w-[413px]">
+            <Card className="w-full xl:w-[413px] xl:shrink-0">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Shield className="w-5 h-5 text-muted-foreground" />
@@ -1209,7 +1209,7 @@ export function TenderDetails({ tenderId, onNavigate }: TenderDetailsProps) {
         </div>
 
         {/* Right Column - Sidebar */}
-        <div className="w-[400px] shrink-0 space-y-6">
+        <div className="w-full space-y-6 xl:w-[400px] xl:shrink-0">
           {/* Days Remaining Card */}
           <div className="bg-amber-50 border border-amber-200 rounded-[20px] p-4 flex gap-4 items-start">
             <Calendar className="w-5 h-5 text-amber-600 shrink-0 mt-1" />

@@ -187,7 +187,7 @@ export default function App() {
   }
 
   return (
-    <div className="md:flex md:min-h-screen">
+    <div className="w-full max-w-full overflow-x-hidden md:flex md:min-h-screen">
       <Header
         onNavigate={handleNavigate}
         onLogout={handleLogout}

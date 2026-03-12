@@ -37,6 +37,9 @@
 
   html {
     font-size: var(--font-size);
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   * {
@@ -48,7 +51,16 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     min-height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     letter-spacing: -0.01em;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   h1,

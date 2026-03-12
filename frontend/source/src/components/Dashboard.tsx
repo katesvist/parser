@@ -251,8 +251,8 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_320px]">
-        <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="min-w-0 space-y-4">
           <section className="surface-card p-3">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-[24px] font-extrabold text-[#303744]">Канбан-доска тендеров</h2>
@@ -337,7 +337,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </section>
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <section className="surface-card overflow-hidden bg-[#1d2234] p-4 text-white">
             <div className="mb-2 flex items-center gap-2 text-[16px] font-bold">
               <Sparkles className="h-4 w-4 text-[#2ebd78]" />

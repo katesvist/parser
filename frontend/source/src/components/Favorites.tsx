@@ -219,7 +219,7 @@ export function Favorites({ onNavigate }: FavoritesProps) {
             placeholder="Поиск в избранном..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-11 min-w-[240px] max-w-[460px] rounded-[10px] border-[#d8dee6] bg-white text-[14px]"
+            className="h-11 w-full max-w-[460px] rounded-[10px] border-[#d8dee6] bg-white text-[14px] sm:min-w-[240px]"
           />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="h-11 w-[240px] rounded-[10px] border-[#d8dee6] bg-white text-[14px]">

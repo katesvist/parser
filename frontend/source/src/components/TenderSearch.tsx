@@ -385,7 +385,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
         </div>
 
         <form className="mb-3 flex flex-wrap gap-2" onSubmit={handleSearchSubmit}>
-          <div className="min-w-[240px] flex-1">
+          <div className="flex-1 basis-full sm:min-w-[240px]">
             <Input
               placeholder="Поиск по ключевым словам..."
               value={searchInput}
@@ -538,7 +538,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
                     </div>
                   </div>
 
-                  <div className="flex min-w-[230px] flex-row items-end justify-between gap-3 lg:block">
+                  <div className="flex min-w-0 flex-row items-end justify-between gap-3 sm:min-w-[230px] lg:block">
                     <button
                       type="button"
                       className="rounded-[8px] border border-[#d9dee7] p-1.5 text-[#7f8895] hover:bg-[#f4f7fb]"
