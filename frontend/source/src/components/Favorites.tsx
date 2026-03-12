@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
@@ -46,6 +46,7 @@ export function Favorites({ onNavigate }: FavoritesProps) {
   const [favoriteDetails, setFavoriteDetails] = useState<Record<string, Tender>>({});
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [kanbanMap, setKanbanMap] = useState<Record<string, string>>({});
+  const unresolvedDetailsRef = useRef<Set<string>>(new Set());
 
   const { tenders, loading, error } = useTenders();
 
@@ -96,30 +97,53 @@ export function Favorites({ onNavigate }: FavoritesProps) {
   }, [tenders]);
 
   useEffect(() => {
-    let active = true;
-    const favoriteIds = Array.from(favorites);
-    const missing = favoriteIds.filter((id) => !tendersByObjectNumber[id] && !favoriteDetails[id]);
+    const favoriteIds = new Set(Array.from(favorites));
+    unresolvedDetailsRef.current = new Set(
+      Array.from(unresolvedDetailsRef.current).filter((id) => favoriteIds.has(id)),
+    );
 
     setFavoriteDetails((prev) => {
+      let changed = false;
       const next: Record<string, Tender> = {};
-      for (const id of favoriteIds) {
-        if (prev[id]) next[id] = prev[id];
+      for (const [id, tender] of Object.entries(prev)) {
+        if (favoriteIds.has(id)) {
+          next[id] = tender;
+        } else {
+          changed = true;
+        }
       }
-      return next;
+      return changed ? next : prev;
     });
+  }, [favorites]);
 
-    if (!missing.length) {
+  const missingDetailIds = useMemo(() => {
+    return Array.from(favorites).filter(
+      (id) =>
+        !tendersByObjectNumber[id] &&
+        !favoriteDetails[id] &&
+        !unresolvedDetailsRef.current.has(id),
+    );
+  }, [favorites, tendersByObjectNumber, favoriteDetails]);
+
+  useEffect(() => {
+    if (!missingDetailIds.length) {
       setDetailsLoading(false);
-      return () => {
-        active = false;
-      };
+      return;
     }
 
+    let active = true;
     setDetailsLoading(true);
+
     (async () => {
-      const loaded = await loadTenderDetailsMap(missing);
+      const loaded = await loadTenderDetailsMap(missingDetailIds);
       if (!active) return;
-      if (Object.keys(loaded).length > 0) {
+
+      const loadedIds = new Set(Object.keys(loaded));
+      for (const id of missingDetailIds) {
+        if (!loadedIds.has(id)) unresolvedDetailsRef.current.add(id);
+      }
+
+      if (loadedIds.size > 0) {
         setFavoriteDetails((prev) => ({ ...prev, ...loaded }));
       }
       setDetailsLoading(false);
@@ -128,7 +152,7 @@ export function Favorites({ onNavigate }: FavoritesProps) {
     return () => {
       active = false;
     };
-  }, [favorites, tendersByObjectNumber, favoriteDetails]);
+  }, [missingDetailIds]);
 
   const toggleFavorite = async (id: string) => {
     const next = new Set(favorites);

@@ -46,6 +46,7 @@ export function KanbanBoard({ onNavigate }: KanbanBoardProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const unresolvedDetailsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     let isMounted = true;
@@ -78,32 +79,53 @@ export function KanbanBoard({ onNavigate }: KanbanBoardProps) {
   }, [tenders]);
 
   useEffect(() => {
-    let active = true;
-    const objectNumbers = Object.keys(kanbanMap);
-    const missing = objectNumbers.filter(
-      (objectNumber) => !tendersByObjectNumber[objectNumber] && !kanbanDetails[objectNumber],
+    const activeIds = new Set(Object.keys(kanbanMap));
+    unresolvedDetailsRef.current = new Set(
+      Array.from(unresolvedDetailsRef.current).filter((id) => activeIds.has(id)),
     );
 
     setKanbanDetails((prev) => {
+      let changed = false;
       const next: Record<string, Tender> = {};
-      objectNumbers.forEach((objectNumber) => {
-        if (prev[objectNumber]) next[objectNumber] = prev[objectNumber];
-      });
-      return next;
+      for (const [id, tender] of Object.entries(prev)) {
+        if (activeIds.has(id)) {
+          next[id] = tender;
+        } else {
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
     });
+  }, [kanbanMap]);
 
-    if (!missing.length) {
+  const missingDetailIds = useMemo(() => {
+    return Object.keys(kanbanMap).filter(
+      (objectNumber) =>
+        !tendersByObjectNumber[objectNumber] &&
+        !kanbanDetails[objectNumber] &&
+        !unresolvedDetailsRef.current.has(objectNumber),
+    );
+  }, [kanbanMap, tendersByObjectNumber, kanbanDetails]);
+
+  useEffect(() => {
+    if (!missingDetailIds.length) {
       setDetailsLoading(false);
-      return () => {
-        active = false;
-      };
+      return;
     }
 
+    let active = true;
     setDetailsLoading(true);
+
     (async () => {
-      const loaded = await loadTenderDetailsMap(missing);
+      const loaded = await loadTenderDetailsMap(missingDetailIds);
       if (!active) return;
-      if (Object.keys(loaded).length > 0) {
+
+      const loadedIds = new Set(Object.keys(loaded));
+      for (const id of missingDetailIds) {
+        if (!loadedIds.has(id)) unresolvedDetailsRef.current.add(id);
+      }
+
+      if (loadedIds.size > 0) {
         setKanbanDetails((prev) => ({ ...prev, ...loaded }));
       }
       setDetailsLoading(false);
@@ -112,7 +134,7 @@ export function KanbanBoard({ onNavigate }: KanbanBoardProps) {
     return () => {
       active = false;
     };
-  }, [kanbanMap, tendersByObjectNumber, kanbanDetails]);
+  }, [missingDetailIds]);
 
   const handleStatusChange = useCallback(async (objectNumber: string, status: string) => {
     setSaving(objectNumber);
