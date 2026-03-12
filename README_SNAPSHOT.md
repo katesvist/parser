@@ -18,3 +18,15 @@
 - `infra/docker-compose.prod.snapshot.yml` — снапшот compose с прода
 - `infra/docker-compose.n8n-workers.snapshot.yml` — снапшот n8n workers
 - `infra/Caddyfile.snapshot` — снапшот Caddy
+
+## Быстрый bootstrap env
+```bash
+chmod +x scripts/bootstrap-env.sh
+./scripts/bootstrap-env.sh
+```
+
+Скрипт создаёт:
+- `services/api/.env` из `services/api/.env.example`
+- `services/parser/.env` из `services/parser/.env.example`
+- `frontend/source/.env` из `frontend/source/.env.example`
+- `services/parser/config/keywords.json` (если отсутствует)
