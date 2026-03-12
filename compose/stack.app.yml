@@ -1,4 +1,17 @@
 services:
+  frontend:
+    profiles: ["frontend"]
+    build:
+      context: ../frontend/source
+      args:
+        VITE_API_BASE: ${FRONTEND_VITE_API_BASE:-/api}
+    container_name: parser-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8088}:80"
+    networks:
+      - stack
+
   parser-api:
     image: node:18-alpine
     container_name: parser-api

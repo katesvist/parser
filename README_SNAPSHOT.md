@@ -20,6 +20,7 @@
 - `infra/docker-compose.n8n-workers.snapshot.yml` — снапшот n8n workers
 - `infra/Caddyfile.snapshot` — снапшот Caddy
 - `compose/stack.app.yml` — app-слой (`parser-api`, `docling`, `worker-ingest`, `worker-docs`, `worker-analytics`)
+  - опционально `frontend` (profile `frontend`), сборка на сервере из `frontend/source`
 - `env/stack.env.example` — общие параметры стека (project/network/ports/domains)
 
 ## Быстрый bootstrap env
@@ -58,6 +59,13 @@ chmod +x scripts/*.sh
 ./scripts/up-app.sh
 ./scripts/healthcheck.sh
 ```
+
+Чтобы фронт тоже деплоился на сервере, в `env/stack.env`:
+- `FRONTEND_ENABLED=1`
+- `FRONTEND_PORT=8088` (или свой)
+- `FRONTEND_VITE_API_BASE=/api` (или полный URL API)
+
+После этого `./scripts/up-app.sh` сам соберёт фронт-контейнер из `frontend/source` и поднимет его.
 
 ## Важно по сетям
 - По умолчанию `PROJECT_NAME=tender-stack`.

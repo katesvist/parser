@@ -23,9 +23,21 @@ export PROJECT_NAME STACK_NETWORK
 
 docker network create "$STACK_NETWORK" >/dev/null 2>&1 || true
 
+COMPOSE_ARGS=(
+  -p "$PROJECT_NAME"
+  -f "$ROOT_DIR/compose/stack.app.yml"
+)
+
+if [[ "${FRONTEND_ENABLED:-0}" == "1" ]]; then
+  COMPOSE_ARGS+=(--profile frontend)
+fi
+
 docker compose \
-  -p "$PROJECT_NAME" \
-  -f "$ROOT_DIR/compose/stack.app.yml" \
+  "${COMPOSE_ARGS[@]}" \
   up -d --build
 
-echo "App stack started (parser-api + docling + workers)."
+if [[ "${FRONTEND_ENABLED:-0}" == "1" ]]; then
+  echo "App stack started (parser-api + docling + workers + frontend)."
+else
+  echo "App stack started (parser-api + docling + workers)."
+fi

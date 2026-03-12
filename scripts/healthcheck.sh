@@ -11,6 +11,8 @@ fi
 
 PROJECT_NAME="${PROJECT_NAME:-tender-stack}"
 API_PORT="${API_PORT:-8787}"
+FRONTEND_ENABLED="${FRONTEND_ENABLED:-0}"
+FRONTEND_PORT="${FRONTEND_PORT:-8088}"
 
 echo "== parser-api /health =="
 curl -fsS "http://127.0.0.1:${API_PORT}/health" && echo
@@ -28,3 +30,8 @@ docker ps --format 'table {{.Names}}\t{{.Status}}' | grep supabase-db || true
 
 echo "== app services =="
 docker compose -p "$PROJECT_NAME" -f "$ROOT_DIR/compose/stack.app.yml" ps
+
+if [[ "$FRONTEND_ENABLED" == "1" ]]; then
+  echo "== frontend =="
+  curl -fsS -o /dev/null -w "HTTP %{http_code}\n" "http://127.0.0.1:${FRONTEND_PORT}/"
+fi
