@@ -1,0 +1,38 @@
+{
+  "collection": "@nestjs/schematics",
+  "monorepo": true,
+  "root": "apps/worker-ingest",
+  "sourceRoot": "apps/worker-ingest/src",
+  "compilerOptions": {
+    "deleteOutDir": true
+  },
+  "projects": {
+    "worker-ingest": {
+      "type": "application",
+      "root": "apps/worker-ingest",
+      "entryFile": "main",
+      "sourceRoot": "apps/worker-ingest/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/worker-ingest/tsconfig.app.json"
+      }
+    },
+    "worker-docs": {
+      "type": "application",
+      "root": "apps/worker-docs",
+      "entryFile": "main",
+      "sourceRoot": "apps/worker-docs/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/worker-docs/tsconfig.app.json"
+      }
+    },
+    "worker-analytics": {
+      "type": "application",
+      "root": "apps/worker-analytics",
+      "entryFile": "main",
+      "sourceRoot": "apps/worker-analytics/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/worker-analytics/tsconfig.app.json"
+      }
+    }
+  }
+}

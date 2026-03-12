@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Sora:wght@500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-size: 16px;
+    --background: #f6f8fb;
+    --foreground: #0b1020;
+    --card: #fff;
+    --card-foreground: #0b1020;
+    --popover: #fff;
+    --popover-foreground: #0b1020;
+    --primary: #1f3c88;
+    --primary-foreground: #ffffff;
+    --secondary: #eef2f7;
+    --secondary-foreground: #0b1020;
+    --muted: #f1f4f9;
+    --muted-foreground: #6b7280;
+    --accent: #eef2ff;
+    --accent-foreground: #0b1020;
+    --destructive: #d4183d;
+    --destructive-foreground: #fff;
+    --border: #dbe2ef;
+    --input: transparent;
+    --input-background: #ffffff;
+    --switch-background: #cbced4;
+    --font-weight-medium: 500;
+    --font-weight-normal: 400;
+    --ring: #1f3c88;
+    --chart-1: oklch(.646 .222 41.116);
+    --chart-2: oklch(.6 .118 184.704);
+    --chart-3: oklch(.398 .07 227.392);
+    --chart-4: oklch(.828 .189 84.429);
+    --chart-5: oklch(.769 .188 70.08);
+    --radius: .9rem;
+    --sidebar: oklch(.985 0 0);
+    --sidebar-foreground: oklch(.145 0 0);
+    --sidebar-primary: #030213;
+    --sidebar-primary-foreground: oklch(.985 0 0);
+    --sidebar-accent: oklch(.97 0 0);
+    --sidebar-accent-foreground: oklch(.205 0 0);
+    --sidebar-border: oklch(.922 0 0);
+    --sidebar-ring: oklch(.708 0 0);
+    --font-sans: "Manrope", "Segoe UI", system-ui, sans-serif;
+    --font-display: "Sora", "Manrope", system-ui, sans-serif;
+  }
+
+  .dark {
+    --background: oklch(.145 0 0);
+    --foreground: oklch(.985 0 0);
+    --card: oklch(.145 0 0);
+    --card-foreground: oklch(.985 0 0);
+    --popover: oklch(.145 0 0);
+    --popover-foreground: oklch(.985 0 0);
+    --primary: oklch(.985 0 0);
+    --primary-foreground: oklch(.205 0 0);
+    --secondary: oklch(.269 0 0);
+    --secondary-foreground: oklch(.985 0 0);
+    --muted: oklch(.269 0 0);
+    --muted-foreground: oklch(.708 0 0);
+    --accent: oklch(.269 0 0);
+    --accent-foreground: oklch(.985 0 0);
+    --destructive: oklch(.396 .141 25.723);
+    --destructive-foreground: oklch(.637 .237 25.331);
+    --border: oklch(.269 0 0);
+    --input: oklch(.269 0 0);
+    --ring: oklch(.439 0 0);
+    --font-weight-medium: 500;
+    --font-weight-normal: 400;
+    --chart-1: oklch(.488 .243 264.376);
+    --chart-2: oklch(.696 .17 162.48);
+    --chart-3: oklch(.769 .188 70.08);
+    --chart-4: oklch(.627 .265 303.9);
+    --chart-5: oklch(.645 .246 16.439);
+    --sidebar: oklch(.205 0 0);
+    --sidebar-foreground: oklch(.985 0 0);
+    --sidebar-primary: oklch(.488 .243 264.376);
+    --sidebar-primary-foreground: oklch(.985 0 0);
+    --sidebar-accent: oklch(.269 0 0);
+    --sidebar-accent-foreground: oklch(.985 0 0);
+    --sidebar-border: oklch(.269 0 0);
+    --sidebar-ring: oklch(.439 0 0);
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply text-foreground;
+    background:
+      radial-gradient(1200px 600px at 0% -10%, rgba(226, 234, 255, 0.6), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(214, 229, 255, 0.5), transparent 50%),
+      var(--background);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+}
+
+.kanban-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.kanban-scroll::-webkit-scrollbar {
+  display: none;
+}

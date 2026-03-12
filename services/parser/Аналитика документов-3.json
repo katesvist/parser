@@ -1,0 +1,633 @@
+{
+  "name": "Аналитика документов",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  ta.id, \n  ta.object_number, \n  ta.file_name, \n  ta.url, \n  ta.doc_kind_code, \n  ta.file_size,\n  tg.placingway_name,\n  tg.maxprice\nFROM tender_attachments ta\nLEFT JOIN tender_attachments_summary tas ON ta.id = tas.attachment_id\nLEFT JOIN tenders_gov tg ON ta.object_number = tg.object_number\nWHERE tas.id IS NULL\n  AND ta.file_name NOT ILIKE '%.zip'\n  AND ta.file_name NOT ILIKE '%.rar' \n  AND ta.file_name NOT ILIKE '%.7z' \n  AND ta.file_name NOT ILIKE '%.docx.pdf'\n\nORDER BY ta.created_at DESC\nLIMIT 20;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "e64cdcf4-2247-4e8b-8b7d-8f43d5078128",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "I9PGjAMStl3ugHXq",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "340052ec-3d36-4307-955f-4d2b71853bce",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.unstructuredapp.io/general/v0/general",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "unstructured-api-key",
+              "value": "f4hfnXrQqMUKVfypMVsQyBts1HfdP9"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "strategy",
+              "value": "auto"
+            },
+            {
+              "name": "vlm_model_provider",
+              "value": "openai"
+            },
+            {
+              "name": "vlm_model",
+              "value": "gpt-4o"
+            },
+            {
+              "name": "output_format",
+              "value": "application/json"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "files",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1120,
+        16
+      ],
+      "id": "487b9ef6-0d26-467a-97ee-e54d0e903f81",
+      "name": "HTTP Request1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  json: {\n    attachment_id: $json.id,\n    object_number: $json.object_number,\n    doc_kind_code: $json.doc_kind_code,\n    file_name: $json.file_name,\n    url: $json.url,\n    file_size: $json.file_size,\n    placingway_name: $json.placingway_name,\n    maxprice: $json.maxprice,\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "c7dc6b46-5b5f-450d-966e-95b0ab6a2ab5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Достаем метаданные (\"attachment_id\" и др.) из конкретной ноды \"Code in JavaScript\"\n// n8n сам найдет нужный родительский элемент для текущей итерации цикла\nconst meta = $('Code in JavaScript').item.json;\n\n// 2. Собираем все фрагменты текста, пришедшие от Unstructured\nconst inputItems = $input.all();\nlet elements = [];\n\n// Универсальная обработка: проверяем, пришли данные списком items или массивом в одном item\nif (inputItems.length === 1 && Array.isArray(inputItems[0].json)) {\n  elements = inputItems[0].json;\n} else {\n  elements = inputItems.map(i => i.json);\n}\n\n// 3. Фильтрация и склейка (ваша логика)\nconst parts = [];\nfor (const e of elements) {\n  if (!e || typeof e !== 'object') continue;\n  \n  const type = e.type || '';\n  const text = (e.text || '').trim();\n  \n  if (!text) continue;\n  // Оставляем только полезные блоки\n  if (!['Title', 'NarrativeText', 'UncategorizedText', 'ListItem', 'Table'].includes(type)) continue;\n\n  parts.push(type === 'Table' ? `\\n[TABLE]\\n${text}\\n[/TABLE]\\n` : text);\n}\n\nconst extractedText = parts.join('\\n\\n').slice(0, 50000);\n\n// 4. Возвращаем единый объект: ваши исходные метаданные + новый текст\nreturn [{\n  json: {\n    ...meta,\n    extracted_text: extractedText,\n    elements_count: elements.length,\n    extraction_success: extractedText.length > 0\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        0
+      ],
+      "id": "de64ef70-ce18-4b3e-bb59-e792f867916a",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Текст документа:\n{{ $json.extracted_text }}",
+        "options": {
+          "systemMessage": "=ИНСТРУКЦИЯ:\nТы — старший юрист по госзакупкам (44-ФЗ). Твоя задача — извлечь риски и ключевые условия из текста.\n\nверни СТРОГО валидный JSON:\n- без markdown,\n- без ```,\n- двойные кавычки внутри текста экранируй как \\\"\n\nФормат JSON:\n{\n  \"summary\": \"Сжатое резюме сути документа (макс. 300 знаков)\",\n  \"key_requirements\": [\"Список требуемых лицензий, СРО или специфических требований к участнику\"],\n  \"key_terms\": {\n    \"warranty_months\": \"Гарантийный срок (число или null)\",\n    \"delivery_days\": \"Срок исполнения в днях (число или строка, если сложный график)\",\n    \"guarantee_percent\": \"Обеспечение (%, число или null)\",\n    \"payment_type\": \"Условия оплаты (кратко, например: 'По факту, отсрочка 7 дней')\",\n    \"quality_standard\": \"ГОСТы/ТУ (строка или null)\"\n  },\n  \"complexity_score\": \"Целое число от 1 (просто) до 5 (сложно/рискованно)\",\n  \"risk_flags\": [\"Массив строк с описанием рисков (штрафы, размытое ТЗ, сжатые сроки)\"]\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1536,
+        0
+      ],
+      "id": "29e5e9b1-94a7-429b-80fa-6b845c45683b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "=google/gemini-2.5-flash",
+          "mode": "id"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1536,
+        224
+      ],
+      "id": "2509ce71-9bf9-47df-a6b0-adaac8d11d07",
+      "name": "OpenAI Chat Model",
+      "retryOnFail": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "9GhULjV5Pp4bxBAJ",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        880,
+        0
+      ],
+      "id": "e2e1e802-070e-4769-8b11-d8b53e877a78",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parent = $items('Code in JavaScript1'); // массив items\nconst out = [];\n\nfor (let i = 0; i < $input.all().length; i++) {\n  const inputItem = $input.all()[i];\n  const raw = inputItem.json.output ?? inputItem.json.text ?? \"\";\n  const aiOutputString = typeof raw === \"string\" ? raw : JSON.stringify(raw);\n\n  let s = aiOutputString\n    .replace(/```(?:json)?\\s*/gi, \"\")\n    .replace(/```/g, \"\")\n    .trim();\n\n  let aiData;\n  try {\n    aiData = JSON.parse(s);\n  } catch {\n    // попытка вырезать объект\n    const start = s.indexOf(\"{\");\n    const end = s.lastIndexOf(\"}\");\n    aiData = (start !== -1 && end !== -1)\n      ? JSON.parse(s.slice(start, end + 1))\n      : { summary: \"Error parsing JSON\", error: true };\n  }\n\n  const meta = parent[i]?.json ?? {};\n\n  out.push({\n    json: {\n      object_number: meta.object_number,\n      attachment_id: meta.attachment_id,\n      doc_kind_code: meta.doc_kind_code,\n      extracted_text: meta.extracted_text,\n\n      summary: aiData?.summary ?? null,\n      key_requirements: Array.isArray(aiData?.key_requirements) ? aiData.key_requirements : [],\n      key_terms: (aiData?.key_terms && typeof aiData.key_terms === \"object\") ? aiData.key_terms : {},\n      estimated_complexity: Number.isFinite(aiData?.complexity_score) ? aiData.complexity_score : null,\n      risk_flags: Array.isArray(aiData?.risk_flags) ? aiData.risk_flags : [],\n    }\n  });\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        0
+      ],
+      "id": "a975d3f2-b1d4-4f5e-9410-8866ee7e1db2",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tender_attachments_summary",
+          "mode": "list",
+          "cachedResultName": "tender_attachments_summary"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "object_number": "={{ $json.object_number }}",
+            "attachment_id": "={{ $json.attachment_id }}",
+            "doc_kind_code": "={{ $json.doc_kind_code }}",
+            "summary": "={{ $json.summary }}",
+            "key_terms": "={{ $json.key_terms }}",
+            "estimated_complexity": "={{ $json.estimated_complexity }}",
+            "risk_flags": "={{ $json.risk_flags }}",
+            "key_requirements": "={{ $json.key_requirements }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "object_number",
+              "displayName": "object_number",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "attachment_id",
+              "displayName": "attachment_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "doc_kind_code",
+              "displayName": "doc_kind_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "key_requirements",
+              "displayName": "key_requirements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "array",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "key_terms",
+              "displayName": "key_terms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estimated_complexity",
+              "displayName": "estimated_complexity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "risk_flags",
+              "displayName": "risk_flags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "array",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "extracted_text",
+              "displayName": "extracted_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "llm_model",
+              "displayName": "llm_model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "llm_used_tokens",
+              "displayName": "llm_used_tokens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "is_skipped_zip",
+              "displayName": "is_skipped_zip",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2096,
+        0
+      ],
+      "id": "d7a132aa-8d5c-4a34-87f6-a12a185c3568",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "I9PGjAMStl3ugHXq",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        208
+      ],
+      "id": "6d058e13-b3d9-44c0-b608-b040f66ff496",
+      "name": "Wait",
+      "webhookId": "8413db30-d225-4b9e-800e-6c09557077d9"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.success }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "34fb1f6b-cd7f-4b10-9647-153ce86472e8"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "00269b09-4293-4c68-9c7f-0924b0e2ce4d",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "a704a02a-12e1-40e0-b83a-aa837ef1a90d",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "9b017e61-642f-44e4-a9b4-edb9adae5803",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "80bbbf8f72067be2f41f53e5220e10b1fbaaae8c0ca79d00dbdf80fd6100f3a7"
+  },
+  "id": "nyl0a8po8XVQDgf_84Wuu",
+  "tags": []
+}

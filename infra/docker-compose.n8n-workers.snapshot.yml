@@ -1,0 +1,140 @@
+# Auto-generated file for n8n worker-runner pairs
+# Regenerate with: bash scripts/generate_n8n_workers.sh
+# DO NOT EDIT MANUALLY - this file is overwritten on each run
+
+services:
+  n8n-worker-1:
+    extends:
+      file: docker-compose.yml
+      service: n8n-worker-template
+    container_name: n8n-worker-1
+    profiles: ["n8n"]
+    restart: unless-stopped
+    depends_on:
+      n8n:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  n8n-runner-1:
+    extends:
+      file: docker-compose.yml
+      service: n8n-runner-template
+    container_name: n8n-runner-1
+    profiles: ["n8n"]
+    restart: unless-stopped
+    network_mode: "service:n8n-worker-1"
+    depends_on:
+      n8n-worker-1:
+        condition: service_healthy
+
+  n8n-worker-2:
+    extends:
+      file: docker-compose.yml
+      service: n8n-worker-template
+    container_name: n8n-worker-2
+    profiles: ["n8n"]
+    restart: unless-stopped
+    depends_on:
+      n8n:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  n8n-runner-2:
+    extends:
+      file: docker-compose.yml
+      service: n8n-runner-template
+    container_name: n8n-runner-2
+    profiles: ["n8n"]
+    restart: unless-stopped
+    network_mode: "service:n8n-worker-2"
+    depends_on:
+      n8n-worker-2:
+        condition: service_healthy
+
+  n8n-worker-3:
+    extends:
+      file: docker-compose.yml
+      service: n8n-worker-template
+    container_name: n8n-worker-3
+    profiles: ["n8n"]
+    restart: unless-stopped
+    depends_on:
+      n8n:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  n8n-runner-3:
+    extends:
+      file: docker-compose.yml
+      service: n8n-runner-template
+    container_name: n8n-runner-3
+    profiles: ["n8n"]
+    restart: unless-stopped
+    network_mode: "service:n8n-worker-3"
+    depends_on:
+      n8n-worker-3:
+        condition: service_healthy
+
+  n8n-worker-4:
+    extends:
+      file: docker-compose.yml
+      service: n8n-worker-template
+    container_name: n8n-worker-4
+    profiles: ["n8n"]
+    restart: unless-stopped
+    depends_on:
+      n8n:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  n8n-runner-4:
+    extends:
+      file: docker-compose.yml
+      service: n8n-runner-template
+    container_name: n8n-runner-4
+    profiles: ["n8n"]
+    restart: unless-stopped
+    network_mode: "service:n8n-worker-4"
+    depends_on:
+      n8n-worker-4:
+        condition: service_healthy
+
+  n8n-worker-5:
+    extends:
+      file: docker-compose.yml
+      service: n8n-worker-template
+    container_name: n8n-worker-5
+    profiles: ["n8n"]
+    restart: unless-stopped
+    depends_on:
+      n8n:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  n8n-runner-5:
+    extends:
+      file: docker-compose.yml
+      service: n8n-runner-template
+    container_name: n8n-runner-5
+    profiles: ["n8n"]
+    restart: unless-stopped
+    network_mode: "service:n8n-worker-5"
+    depends_on:
+      n8n-worker-5:
+        condition: service_healthy
+

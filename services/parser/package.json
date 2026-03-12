@@ -1,0 +1,35 @@
+{
+  "name": "tender-parser",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "nest build worker-ingest && nest build worker-docs && nest build worker-analytics",
+    "start:worker-ingest": "node dist/apps/worker-ingest/apps/worker-ingest/src/main.js",
+    "start:worker-docs": "node dist/apps/worker-docs/apps/worker-docs/src/main.js",
+    "start:worker-analytics": "node dist/apps/worker-analytics/apps/worker-analytics/src/main.js",
+    "start:dev:worker-ingest": "nest start worker-ingest --watch",
+    "start:dev:worker-docs": "nest start worker-docs --watch",
+    "start:dev:worker-analytics": "nest start worker-analytics --watch",
+    "seed:legal": "node tools/seed-legal-rag.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.3.0",
+    "@nestjs/config": "^3.2.0",
+    "@nestjs/core": "^10.3.0",
+    "@nestjs/platform-fastify": "^10.3.0",
+    "@nestjs/schedule": "^3.0.0",
+    "fast-xml-parser": "^4.5.0",
+    "iconv-lite": "^0.6.3",
+    "jszip": "^3.10.1",
+    "pg": "^8.11.3",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.3.0",
+    "@nestjs/schematics": "^10.0.0",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}

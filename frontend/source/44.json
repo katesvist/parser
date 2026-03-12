@@ -1,0 +1,888 @@
+{
+        "id": "41305611",
+        "object_number": "0872500002325000056",
+        "href": "https://zakupki.gov.ru/epz/order/notice/ea20/view/common-info.html?regNumber=0872500002325000056",
+        "zakon": "44-ФЗ",
+        "kotirovki": "Электронный аукцион №0872500002325000056",
+        "url_223_xml": null,
+        "etap_zakupki": "Подача заявок",
+        "object_info": "Поставка нефтепродуктов для автомобилей",
+        "placingway_code": "EAP20",
+        "placingway_name": "Электронный аукцион",
+        "etp_code": "ETP_RTS",
+        "etp_name": "РТС-тендер",
+        "etp_url": "http://www.rts-tender.ru",
+        "onst83ch2": "true",
+        "startdt": "2025-11-26T13:44:39.000Z",
+        "enddt": "2025-12-04T07:00:00.000Z",
+        "biddingdt": null,
+        "summarizingdt": null,
+        "maxprice": "2697900.00",
+        "currency_code": "RUB",
+        "currency_name": "РОССИЙСКИЙ РУБЛЬ",
+        "bik": "014030106",
+        "settlementaccount": "03222643400000007200",
+        "personalaccount": "0420007",
+        "creditorgname": "ОКЦ № 1 СЗГУ Банка России//УФК по г.Санкт-Петербургу, г Санкт-Петербург",
+        "corraccountnumber": null,
+        "procedureinfo": "Исполнение контракта может обеспечиваться предоставлением независимой гарантии, соответствующей требованиям ст. 45 Закона, или внесением денежных средств на указанный заказчиком счет, на котором в соответствии с законодательством Российской Федерации учитываются операции со средствами, поступающими заказчику. Бенефициаром по независимой гарантии выступает Санкт-Петербургское государственное казенное учреждение «Аварийно-спасательная служба по предупреждению и ликвидации аварийных разливов нефти и нефтепродуктов на акваториях и выполнению ледокольных работ «ПИЛАРН» (СПБ ГКУ «ПИЛАРН») (Банковские реквизиты: УФК по г. Санкт-Петербургу (Комитет Финансов СПб ГКУ «ПИЛАРН» л/счет 0420007); БИК 014030106 Северо-Западное ГУ Банка России//УФК по г. Санкт-Петербургу, г. Санкт-Петербург кор/счет банка плательщика; № 40102810945370000005; Счет для перечисления во временное распоряжение: 03222643400000007200).",
+        "part": "10.00",
+        "publicdiscussion": null,
+        "ikz_code": "252780172103978010100100150021920244",
+        "ikz_customercode": "27801721039780101001",
+        "ikz_number": "0015",
+        "ikz_ordernumber": "002",
+        "okpd2info": "Нефтепродукты",
+        "kvr_code": "244",
+        "kvr_info": "Прочая закупка товаров, работ и услуг",
+        "contract_enddate": null,
+        "finance_total": "2697900.00",
+        "countrycode": null,
+        "countryfullname": null,
+        "garaddress": null,
+        "deliveryplace": null,
+        "onesiderejectionst95": "true",
+        "servicerequirement": null,
+        "manufacturerequirement": null,
+        "warrantytermdt": null,
+        "addinfo": null,
+        "preferense_code": null,
+        "preferense_name": null,
+        "requirement_1": null,
+        "requirement_2": null,
+        "objectsch9st37": null,
+        "regnum": "08725000023",
+        "consregistrynum": "402J0920",
+        "fullname": "САНКТ-ПЕТЕРБУРГСКОЕ ГОСУДАРСТВЕННОЕ КАЗЕННОЕ УЧРЕЖДЕНИЕ \"АВАРИЙНО-СПАСАТЕЛЬНАЯ СЛУЖБА ПО ПРЕДУПРЕЖДЕНИЮ И ЛИКВИДАЦИИ АВАРИЙНЫХ РАЗЛИВОВ НЕФТИ И НЕФТЕПРОДУКТОВ НА АКВАТОРИЯХ И ВЫПОЛНЕНИЮ ЛЕДОКОЛЬНЫХ РАБОТ \"ПИЛАРН\"",
+        "shortname": null,
+        "postaddress": "199004, Санкт-Петербург г., 199004, Российская Федерация, Санкт-Петербург г., Василеостровский, Санкт-Петербург, Санкт-Петербург, 7-я линия, 56-58, А, 1, ЛИНИЯ 7-Я В.О., Д. ЛИТЕРА 56-58 А, 40308000",
+        "factaddress": "199004, Санкт-Петербург, 7-я В.О. линия, Д. 56-58 ЛИТЕРА А, 40308000",
+        "inn": "7801721039",
+        "kpp": "780101001",
+        "responsiblerole": "CU",
+        "orgpostaddress": "199004, Санкт-Петербург г., 199004, Российская Федерация, Санкт-Петербург г., Василеостровский, Санкт-Петербург, Санкт-Петербург, 7-я линия, 56-58, А, 1, ЛИНИЯ 7-Я В.О., Д. ЛИТЕРА 56-58 А, 40308000",
+        "orgfactaddress": "199004, Санкт-Петербург, 7-я В.О. линия, Д. 56-58 ЛИТЕРА А, 40308000",
+        "person_lastname": "Кириевский",
+        "person_firstname": "С.",
+        "person_middlename": "С.",
+        "contactemail": "document@pilarn.ru",
+        "contactphone": "7-812-2469158",
+        "contactfax": null,
+        "created_at": "2025-11-28T22:22:48.939Z",
+        "updated_at": "2025-11-28T22:22:48.939Z",
+        "purchase_procedure_type": null,
+        "object_description": null,
+        "lots_count": 0,
+        "plan_registration_number": null,
+        "plan_guid": null,
+        "position_number": 0,
+        "is_small_or_middle": false,
+        "is_centralized": false,
+        "is_subcontractors_req": false,
+        "delivery_place_indication": null,
+        "last_modified_date": null,
+        "items": [
+            {
+                "id": "279",
+                "object_number": "0872500002325000056",
+                "item_name": "Топливо дизельное межсезонное экологического класса не ниже К5 (розничная поставка)",
+                "item_code": null,
+                "okpdcode": "19.20.21.345",
+                "okpdname": "Топливо дизельное межсезонное экологического класса К5",
+                "quantity_name": "Литр; кубический дециметр",
+                "price_for_one": "87.15",
+                "quantity_value": "0.0000",
+                "total_sum": "87.15",
+                "created_at": "2025-11-29T00:31:20.627Z",
+                "updated_at": "2025-11-29T00:31:20.627Z",
+                "lot_number": null,
+                "lot_item_number": 0,
+                "position_guid": null,
+                "okei_code": "112",
+                "okei_name": "Литр; кубический дециметр",
+                "okved2_code": null,
+                "okved2_name": null,
+                "is_for_small_or_middle": false,
+                "is_ignored": false,
+                "is_centralized": false,
+                "delivery_place_code": null,
+                "is_joint_lot": false,
+                "plan_position_type": null,
+                "is_drug_purchase": false,
+                "hierarchy_type": null,
+                "volume_specifying_method": null,
+                "is_undefined_quantity": false,
+                "characteristics_text": null,
+                "is_preferense_rf_purchase": false,
+                "characteristics_detailed_json": null,
+                "restriction_reasons_json": {
+                    "isPreferenseRFPurchaseObjects": "true"
+                },
+                "is_prohibition_foreign": false,
+                "is_impossibility_prohibition": false,
+                "impossibility_reason": null
+            },
+            {
+                "id": "280",
+                "object_number": "0872500002325000056",
+                "item_name": "Бензин автомобильный (розничная реализация)",
+                "item_code": null,
+                "okpdcode": "19.20.21.100",
+                "okpdname": "Бензин автомобильный",
+                "quantity_name": "Литр; кубический дециметр",
+                "price_for_one": "72.26",
+                "quantity_value": "0.0000",
+                "total_sum": "72.26",
+                "created_at": "2025-11-29T00:31:20.627Z",
+                "updated_at": "2025-11-29T00:31:20.627Z",
+                "lot_number": null,
+                "lot_item_number": 0,
+                "position_guid": null,
+                "okei_code": "112",
+                "okei_name": "Литр; кубический дециметр",
+                "okved2_code": null,
+                "okved2_name": null,
+                "is_for_small_or_middle": false,
+                "is_ignored": false,
+                "is_centralized": false,
+                "delivery_place_code": null,
+                "is_joint_lot": false,
+                "plan_position_type": null,
+                "is_drug_purchase": false,
+                "hierarchy_type": null,
+                "volume_specifying_method": null,
+                "is_undefined_quantity": false,
+                "characteristics_text": null,
+                "is_preferense_rf_purchase": false,
+                "characteristics_detailed_json": {
+                    "addCharacteristicInfoReason": "Характеристики, указанные в КТРУ, не позволяют Заказчику приобрести необходимый товар",
+                    "characteristicsUsingTextForm": [
+                        {
+                            "sid": "258271537",
+                            "name": "Способ обслуживания",
+                            "type": "1",
+                            "values": {
+                                "value": {
+                                    "sid": "331058124",
+                                    "externalSid": "9581024",
+                                    "qualityDescription": "Топливные карты"
+                                }
+                            },
+                            "externalSid": "38651288",
+                            "characteristicsFillingInstruction": {
+                                "code": "6",
+                                "name": "Значение характеристики не может изменяться участником закупки"
+                            }
+                        },
+                        {
+                            "sid": "258271538",
+                            "name": "Соответствие нормативно-технической документации",
+                            "type": "1",
+                            "values": {
+                                "value": {
+                                    "sid": "331058125",
+                                    "externalSid": "9581067",
+                                    "qualityDescription": "ГОСТ Р 51105-2020\nГОСТ 32513-2013"
+                                }
+                            },
+                            "externalSid": "38651321",
+                            "characteristicsFillingInstruction": {
+                                "code": "6",
+                                "name": "Значение характеристики не может изменяться участником закупки"
+                            }
+                        }
+                    ],
+                    "characteristicsUsingReferenceInfo": [
+                        {
+                            "sid": "258271539",
+                            "code": "0aa6adb8-8",
+                            "kind": "1",
+                            "name": "Экологический класс",
+                            "type": "1",
+                            "values": {
+                                "value": {
+                                    "sid": "331058126",
+                                    "externalSid": "9577225",
+                                    "qualityDescription": "Не ниже К5"
+                                }
+                            },
+                            "externalSid": "38648360",
+                            "characteristicsFillingInstruction": {
+                                "code": "2",
+                                "name": "Участник закупки указывает в заявке конкретное значение характеристики"
+                            }
+                        },
+                        {
+                            "sid": "258271540",
+                            "code": "d132c31c-0",
+                            "kind": "1",
+                            "name": "Октановое число бензина автомобильного по исследовательскому методу",
+                            "type": "2",
+                            "values": {
+                                "value": {
+                                    "sid": "331058127",
+                                    "rangeSet": {
+                                        "valueRange": {
+                                            "max": "95",
+                                            "min": "92",
+                                            "maxMathNotation": "less",
+                                            "minMathNotation": "greaterOrEqual"
+                                        }
+                                    },
+                                    "externalSid": "9577224",
+                                    "valueFormat": "N"
+                                }
+                            },
+                            "externalSid": "38648359",
+                            "characteristicsFillingInstruction": {
+                                "code": "2",
+                                "name": "Участник закупки указывает в заявке конкретное значение характеристики"
+                            }
+                        }
+                    ]
+                },
+                "restriction_reasons_json": {
+                    "isPreferenseRFPurchaseObjects": "true"
+                },
+                "is_prohibition_foreign": false,
+                "is_impossibility_prohibition": false,
+                "impossibility_reason": null
+            },
+            {
+                "id": "281",
+                "object_number": "0872500002325000056",
+                "item_name": "Бензин автомобильный (розничная реализация)",
+                "item_code": null,
+                "okpdcode": "19.20.21.100",
+                "okpdname": "Бензин автомобильный",
+                "quantity_name": "Литр; кубический дециметр",
+                "price_for_one": "78.52",
+                "quantity_value": "0.0000",
+                "total_sum": "78.52",
+                "created_at": "2025-11-29T00:31:20.627Z",
+                "updated_at": "2025-11-29T00:31:20.627Z",
+                "lot_number": null,
+                "lot_item_number": 0,
+                "position_guid": null,
+                "okei_code": "112",
+                "okei_name": "Литр; кубический дециметр",
+                "okved2_code": null,
+                "okved2_name": null,
+                "is_for_small_or_middle": false,
+                "is_ignored": false,
+                "is_centralized": false,
+                "delivery_place_code": null,
+                "is_joint_lot": false,
+                "plan_position_type": null,
+                "is_drug_purchase": false,
+                "hierarchy_type": null,
+                "volume_specifying_method": null,
+                "is_undefined_quantity": false,
+                "characteristics_text": null,
+                "is_preferense_rf_purchase": false,
+                "characteristics_detailed_json": {
+                    "addCharacteristicInfoReason": "Характеристики, указанные в КТРУ, не позволяют Заказчику приобрести необходимый товар",
+                    "characteristicsUsingTextForm": [
+                        {
+                            "sid": "258271541",
+                            "name": "Способ обслуживания",
+                            "type": "1",
+                            "values": {
+                                "value": {
+                                    "sid": "331058128",
+                                    "externalSid": "9582004",
+                                    "qualityDescription": "Топливные карты"
+                                }
+                            },
+                            "externalSid": "38652214",
+                            "characteristicsFillingInstruction": {
+                                "code": "6",
+                                "name": "Значение характеристики не может изменяться участником закупки"
+                            }
+                        },
+                        {
+                            "sid": "258271542",
+                            "name": "Соответствие нормативно-технической документации",
+                            "type": "1",
+                            "values": {
+                                "value": {
+                                    "sid": "331058129",
+                                    "externalSid": "9582035",
+                                    "qualityDescription": "ГОСТ Р 51866-2002\nГОСТ 32513-2013"
+                                }
+                            },
+                            "externalSid": "38652245",
+                            "characteristicsFillingInstruction": {
+                                "code": "6",
+                                "name": "Значение характеристики не может изменяться участником закупки"
+                            }
+                        }
+                    ],
+                    "characteristicsUsingReferenceInfo": [
+                        {
+                            "sid": "258271543",
+                            "code": "0aa6adb8-8",
+                            "kind": "1",
+                            "name": "Экологический класс",
+                            "type": "1",
+                            "values": {
+                                "value": {
+                                    "sid": "331058130",
+                                    "externalSid": "9581695",
+                                    "qualityDescription": "Не ниже К5"
+                                }
+                            },
+                            "externalSid": "38651935",
+                            "characteristicsFillingInstruction": {
+                                "code": "2",
+                                "name": "Участник закупки указывает в заявке конкретное значение характеристики"
+                            }
+                        },
+                        {
+                            "sid": "258271544",
+                            "code": "d132c31c-0",
+                            "kind": "1",
+                            "name": "Октановое число бензина автомобильного по исследовательскому методу",
+                            "type": "2",
+                            "values": {
+                                "value": {
+                                    "sid": "331058131",
+                                    "rangeSet": {
+                                        "valueRange": {
+                                            "max": "98",
+                                            "min": "95",
+                                            "maxMathNotation": "less",
+                                            "minMathNotation": "greaterOrEqual"
+                                        }
+                                    },
+                                    "externalSid": "9581694",
+                                    "valueFormat": "N"
+                                }
+                            },
+                            "externalSid": "38651934",
+                            "characteristicsFillingInstruction": {
+                                "code": "2",
+                                "name": "Участник закупки указывает в заявке конкретное значение характеристики"
+                            }
+                        }
+                    ]
+                },
+                "restriction_reasons_json": {
+                    "isPreferenseRFPurchaseObjects": "true"
+                },
+                "is_prohibition_foreign": false,
+                "is_impossibility_prohibition": false,
+                "impossibility_reason": null
+            }
+        ],
+        "attachments": [
+            {
+                "id": "124",
+                "object_number": "0872500002325000056",
+                "published_content_id": "FCEF845BE15F45EF94313185C97132B8",
+                "file_name": "НМЦК_(Автомобильное_топливо_+_ИПЦ)_28.10.25.xlsx",
+                "doc_kind_code": "MRJ",
+                "doc_kind_name": "Обоснование начальной (максимальной) цены контракта",
+                "file_size": "114274",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=FCEF845BE15F45EF94313185C97132B8",
+                "created_at": "2025-11-28T23:05:47.699Z",
+                "updated_at": "2025-11-28T23:05:47.699Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            },
+            {
+                "id": "125",
+                "object_number": "0872500002325000056",
+                "published_content_id": "261AE21A63B54445A72608E26F52E468",
+                "file_name": "Проект_контракта_(Авт._топливо).doc",
+                "doc_kind_code": "CP",
+                "doc_kind_name": "Проект контракта",
+                "file_size": "224768",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=261AE21A63B54445A72608E26F52E468",
+                "created_at": "2025-11-28T23:05:47.699Z",
+                "updated_at": "2025-11-28T23:05:47.699Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            },
+            {
+                "id": "126",
+                "object_number": "0872500002325000056",
+                "published_content_id": "CBB1E836ED714C7B8172E72DF601C5BA",
+                "file_name": "Описание_объекта_закупки_(Авт._топливо)_Версия_2.docx",
+                "doc_kind_code": "POD",
+                "doc_kind_name": "Описание объекта закупки",
+                "file_size": "52183",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=CBB1E836ED714C7B8172E72DF601C5BA",
+                "created_at": "2025-11-28T23:05:47.699Z",
+                "updated_at": "2025-11-28T23:05:47.699Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            },
+            {
+                "id": "127",
+                "object_number": "0872500002325000056",
+                "published_content_id": "02903C7E230548A882AA9D9EE048DB18",
+                "file_name": "Требования_к_содержанию,_составу_заявки_на_участие_в_закупке_и_инструкция_по_ее_заполнению[1].docx",
+                "doc_kind_code": "CAR",
+                "doc_kind_name": "Требование к содержанию, составу заявки на участие в закупке",
+                "file_size": "22880",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=02903C7E230548A882AA9D9EE048DB18",
+                "created_at": "2025-11-28T23:05:47.699Z",
+                "updated_at": "2025-11-28T23:05:47.699Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            },
+            {
+                "id": "128",
+                "object_number": "0872500002325000056",
+                "published_content_id": "E41181F1F2144E1DB3162DA88548E42A",
+                "file_name": "Автоматический контроль.pdf",
+                "doc_kind_code": "AD",
+                "doc_kind_name": "Дополнительная информация и документы",
+                "file_size": "30895",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=E41181F1F2144E1DB3162DA88548E42A",
+                "created_at": "2025-11-28T23:05:47.699Z",
+                "updated_at": "2025-11-28T23:05:47.699Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            },
+            {
+                "id": "235",
+                "object_number": "0872500002325000056",
+                "published_content_id": "FCEF845BE15F45EF94313185C97132B8",
+                "file_name": "НМЦК_(Автомобильное_топливо_+_ИПЦ)_28.10.25.xlsx",
+                "doc_kind_code": "MRJ",
+                "doc_kind_name": "Обоснование начальной (максимальной) цены контракта",
+                "file_size": "114274",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=FCEF845BE15F45EF94313185C97132B8",
+                "created_at": "2025-11-29T00:27:18.054Z",
+                "updated_at": "2025-11-29T00:27:18.054Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            },
+            {
+                "id": "236",
+                "object_number": "0872500002325000056",
+                "published_content_id": "261AE21A63B54445A72608E26F52E468",
+                "file_name": "Проект_контракта_(Авт._топливо).doc",
+                "doc_kind_code": "CP",
+                "doc_kind_name": "Проект контракта",
+                "file_size": "224768",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=261AE21A63B54445A72608E26F52E468",
+                "created_at": "2025-11-29T00:27:18.054Z",
+                "updated_at": "2025-11-29T00:27:18.054Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            },
+            {
+                "id": "237",
+                "object_number": "0872500002325000056",
+                "published_content_id": "CBB1E836ED714C7B8172E72DF601C5BA",
+                "file_name": "Описание_объекта_закупки_(Авт._топливо)_Версия_2.docx",
+                "doc_kind_code": "POD",
+                "doc_kind_name": "Описание объекта закупки",
+                "file_size": "52183",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=CBB1E836ED714C7B8172E72DF601C5BA",
+                "created_at": "2025-11-29T00:27:18.054Z",
+                "updated_at": "2025-11-29T00:27:18.054Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            },
+            {
+                "id": "238",
+                "object_number": "0872500002325000056",
+                "published_content_id": "02903C7E230548A882AA9D9EE048DB18",
+                "file_name": "Требования_к_содержанию,_составу_заявки_на_участие_в_закупке_и_инструкция_по_ее_заполнению[1].docx",
+                "doc_kind_code": "CAR",
+                "doc_kind_name": "Требование к содержанию, составу заявки на участие в закупке",
+                "file_size": "22880",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=02903C7E230548A882AA9D9EE048DB18",
+                "created_at": "2025-11-29T00:27:18.054Z",
+                "updated_at": "2025-11-29T00:27:18.054Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            },
+            {
+                "id": "239",
+                "object_number": "0872500002325000056",
+                "published_content_id": "E41181F1F2144E1DB3162DA88548E42A",
+                "file_name": "Автоматический контроль.pdf",
+                "doc_kind_code": "AD",
+                "doc_kind_name": "Дополнительная информация и документы",
+                "file_size": "30895",
+                "doc_date": "2025-11-27T12:16:30.000Z",
+                "url": "https://zakupki.gov.ru/44fz/filestore/public/1.0/download/priz/file.html?uid=E41181F1F2144E1DB3162DA88548E42A",
+                "created_at": "2025-11-29T00:27:18.054Z",
+                "updated_at": "2025-11-29T00:27:18.054Z",
+                "is_draft": false,
+                "content_uid": null,
+                "document_number": null,
+                "signer_inn": null
+            }
+        ],
+        "attachments_summary": [
+            {
+                "id": "261",
+                "object_number": "0872500002325000056",
+                "attachment_id": "235",
+                "doc_kind_code": "MRJ",
+                "summary": "Документ обосновывает начальную (максимальную) цену контракта на поставку автомобильных нефтепродуктов в 2026 году, включая расчет с применением коэффициентов и индекса потребительских цен по приказу ФАС № 894/24.",
+                "key_requirements": [],
+                "key_terms": {
+                    "payment_type": "рубль РФ, без применения курсов валюты",
+                    "delivery_days": "январь 2026 - декабрь 2026 (12 месяцев)",
+                    "warranty_months": null,
+                    "quality_standard": null,
+                    "guarantee_percent": null
+                },
+                "estimated_complexity": 3,
+                "risk_flags": [
+                    "Отсутствие информации о гарантийных обязательствах и условиях приемки товара",
+                    "Отсутствие требований к лицензиям или СРО участникам закупки",
+                    "Возможные изменения цен на нефтепродукты, не учитываемые вне указанных коэффициентов",
+                    "Изменение ставок рефинансирования и ИПЦ может повлиять на цену в период исполнения контракта"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T19:50:49.380Z",
+                "is_skipped_zip": true
+            },
+            {
+                "id": "263",
+                "object_number": "0872500002325000056",
+                "attachment_id": "236",
+                "doc_kind_code": "CP",
+                "summary": "Гос контракт на поставку нефтепродуктов через топливные карты для СПб ГКУ «ПИЛАРН» в 2026 году. Обеспечение 10% цены контракта, оплата по факту с отсрочкой 7 дней, штрафы за нарушения, обязательная сертификация товара и гарантия качества.",
+                "key_requirements": [
+                    "Предоставление сертификатов соответствия, деклараций, паспортов качества",
+                    "Наличие действующих лицензий у поставщика (уточняется участником)",
+                    "Обеспечение исполнения контракта 10% от начальной цены в виде денег или гарантии",
+                    "Обязательное оформление топливных карт и соблюдение условий их использования",
+                    "Своевременное предоставление отчетных документов и качественной продукции"
+                ],
+                "key_terms": {
+                    "payment_type": "По факту приемки, без аванса (за услуги декабря 2026 — 100% аванс до 15.12.2026), оплата в течение 7 рабочих дней после подписания документа о приемке",
+                    "delivery_days": "с 01.01.2026 по 31.12.2026",
+                    "warranty_months": null,
+                    "quality_standard": "Сертификаты соответствия, декларации, паспорта качества, соответствие техническим регламентам и Постановлению Правительства РФ №2425",
+                    "guarantee_percent": 10
+                },
+                "estimated_complexity": 4,
+                "risk_flags": [
+                    "Обеспечение исполнения контракта в размере 10% может создавать финансовое бремя участникам",
+                    "Цена контракта фиксирована с формулой, но с ограничением максимальной стоимости — риск недополучения прибыли при колебаниях рынка топлива",
+                    "Строгие сроки и порядок приемки товара через электронную систему увеличивают риск задержек в оплате",
+                    "Обязательное круглосуточное обеспечение поставкой на АЗС — риск срывов при технических проблемах",
+                    "Штрафные санкции значительны: до 10% цены контракта за каждый факт нарушения, что увеличивает финансовые риски",
+                    "Риски связанные с несовпадением данных в документах о приемке и отчетности",
+                    "Обязательное соблюдение сложного механизма сверки расчетов и возврата переплат",
+                    "Высокая ответственность за действия соисполнителей и третьих лиц",
+                    "Отсутствие гарантийного срока с конкретным ресурсом или месяцами повышает риски качества без четкой ответственности",
+                    "Риск финансовых потерь при блокировке или утере топливных карт"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T19:51:12.972Z",
+                "is_skipped_zip": true
+            },
+            {
+                "id": "266",
+                "object_number": "0872500002325000056",
+                "attachment_id": "238",
+                "doc_kind_code": "CAR",
+                "summary": "Документ регламентирует требования к содержанию и составу заявки на участие в закупке по 44-ФЗ, включая перечень необходимых документов, подтверждение обеспечения заявки, характеристик товара и правила заполнения заявки на русском языке.",
+                "key_requirements": [
+                    "Документы, предусмотренные подпунктами 'а'-'л', 'м', 'о', 'п' пункта 1 части 1 статьи 43 44-ФЗ",
+                    "Документы, подтверждающие соответствие дополнительным требованиям статьи 31 44-ФЗ (при наличии)",
+                    "Документация, подтверждающая обеспечение заявки (для юрлиц и физлиц из государств ЕАЭС, кроме РФ)",
+                    "Предоставление информации по характеристикам товара в соответствии с частью 2 статьи 33 44-ФЗ",
+                    "Документы и переводы на русский язык в случае иностранного языка"
+                ],
+                "key_terms": {
+                    "payment_type": null,
+                    "delivery_days": null,
+                    "warranty_months": null,
+                    "quality_standard": null,
+                    "guarantee_percent": null
+                },
+                "estimated_complexity": 3,
+                "risk_flags": [
+                    "Зависимость от документов и данных, направляемых оператором электронной площадки, может привести к задержкам или ошибкам",
+                    "Неоднозначности при указании характеристик товара с разными требованиями ('больше или равно', строгое значение)",
+                    "Требование перевода документов на русский язык с преимуществом перевода может вызвать споры из-за расхождений",
+                    "Отсутствие прямых условий по срокам, оплате и гарантии требует внимательного изучения извещения закупки"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T19:51:30.910Z",
+                "is_skipped_zip": true
+            },
+            {
+                "id": "270",
+                "object_number": "0872500002325000056",
+                "attachment_id": "237",
+                "doc_kind_code": "POD",
+                "summary": "Закупка поставки автомобильных нефтепродуктов (бензин АИ-92, АИ-95, дизтопливо К5) с поставкой топливных карт в СПб и Ленобласти на 2026 год. Обеспечение круглосуточных поставок, соответствие ГОСТам, контроль через личный кабинет.",
+                "key_requirements": [
+                    "Наличие сертификатов или деклараций качества нефтепродуктов",
+                    "Функционирование АЗС в СПб и Ленобласти с наличием всех видов топлива",
+                    "Поставщик должен иметь интернет-сайт с личным кабинетом и оперативным контролем за заправками",
+                    "Топливные карты с микросхемой, PIN-кодом, номерные, предоставляются без дополнительной платы",
+                    "Блокировка утерянных топливных карт не более 4 часов",
+                    "Соответствие топлива ГОСТ Р 51105-2020, ГОСТ 32513-2013, ГОСТ Р 51866-2002, ГОСТ Р 52368-2005",
+                    "Соблюдение требований ТР ТС 013/2011, СП 156.13130.2014, приказов Минэнерго и Минтруда"
+                ],
+                "key_terms": {
+                    "payment_type": null,
+                    "delivery_days": "С 01.01.2026 по 31.12.2026, топливные карты в течение 2 рабочих дней после контракта",
+                    "warranty_months": null,
+                    "quality_standard": "ГОСТ Р 51105-2020, ГОСТ 32513-2013, ГОСТ Р 51866-2002, ГОСТ Р 52368-2005, ТР ТС 013/2011",
+                    "guarantee_percent": null
+                },
+                "estimated_complexity": 4,
+                "risk_flags": [
+                    "Требования к наличию всех видов топлива на АЗС одновременно могут осложнить исполнение",
+                    "Обязательство круглосуточной бесперебойной поставки создает высокие операционные риски",
+                    "Неуточнены условия оплаты, что повышает финансовые риски для поставщика",
+                    "Хрупкость условий учета и контроля топлива (зависимость от работы личного кабинета)",
+                    "Поставка дизельного топлива зависит от сезонности, что может влиять на график поставок"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T19:52:03.297Z",
+                "is_skipped_zip": true
+            },
+            {
+                "id": "342",
+                "object_number": "0872500002325000056",
+                "attachment_id": "124",
+                "doc_kind_code": "MRJ",
+                "summary": "Документ обоснует начальную (максимальную) цену контракта на поставку нефтепродуктов для автомобилей на 2026 год, рассчитанную на основании приказа ФАС России № 894/24 с учетом средних потребительских цен, коэффициента отвлечения денежных средств и индекса потребительских цен для Петербурга.",
+                "key_requirements": [],
+                "key_terms": {
+                    "payment_type": "Рубль РФ, без применения валютных курсов ЦБ РФ",
+                    "delivery_days": "с января 2026 по декабрь 2026",
+                    "warranty_months": null,
+                    "quality_standard": null,
+                    "guarantee_percent": null
+                },
+                "estimated_complexity": 3,
+                "risk_flags": [
+                    "Отсутствие указания гарантийных сроков и требований к качеству по ГОСТ/ТУ",
+                    "Цена формируется на основе средних региональных данных, что может не отражать рыночную конъюнктуру",
+                    "Срок исполнения один год, но точные графики поставки и объемы не детализированы",
+                    "Отсутствие требований по обеспечению исполнения контракта"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T20:24:28.689Z",
+                "is_skipped_zip": true
+            },
+            {
+                "id": "343",
+                "object_number": "0872500002325000056",
+                "attachment_id": "125",
+                "doc_kind_code": "CP",
+                "summary": "Контракт на поставку нефтепродуктов для автомобилей в Санкт-Петербурге с использованием топливных карт, регулирование цены, условий оплаты, обеспечения и ответственности сторон, включая подробный механизм приемки, контроля качества и порядок разрешения споров.",
+                "key_requirements": [
+                    "Подтверждение качества товара сертификатами соответствия и паспортами качества",
+                    "Соответствие товара требованиям законодательства Российской Федерации и техническим регламентам",
+                    "Предоставление обеспечения исполнения контракта в размере 10% от начальной цены",
+                    "Наличие усиленной электронной подписи при формировании документов о приемке",
+                    "Своевременное представление отчетных и сопроводительных документов",
+                    "Предоставление списка АЗС и круглосуточное обеспечение товара на АЗС",
+                    "Обеспечение безопасности и маркировки товара согласно законодательству"
+                ],
+                "key_terms": {
+                    "payment_type": "Оплата по факту приемки в течение 7 рабочих дней, авансов не предусмотрено, кроме услуг за декабрь 2026 года (100% предоплата)",
+                    "delivery_days": 365,
+                    "warranty_months": null,
+                    "quality_standard": "Соответствие техническим регламентам, сертификаты и декларации о соответствии, ГОСТы и ТУ по виду товара, обязательная маркировка по законодательству",
+                    "guarantee_percent": 10
+                },
+                "estimated_complexity": 5,
+                "risk_flags": [
+                    "Для оплаты за услуги декабря 2026 требуется 100% предоплата, что увеличивает финансовые риски",
+                    "Обеспечение исполнения контракта составляет 10%, что требует значительных финансовых ресурсов",
+                    "Неустойки и штрафы могут достигать до 10% цены контракта за каждый факт нарушения, высокая финансовая ответственность",
+                    "Сложный и многоступенчатый порядок приемки товара с цифровой отчетностью и возможностью мотивированного отказа",
+                    "Риск блокировки топливных карт и необходимость быстрых действий по их утере",
+                    "Обязательность круглосуточного обеспечения товара на АЗС без перерывов",
+                    "Возможные убытки при несоответствии качества товара, включая расходы на экспертизу и компенсации",
+                    "Необходимость оперативного информирования и строгого соблюдения сроков отчетности и изменений данных",
+                    "Риски изменения расчетного счета и связанные с этим возможные потери платежей",
+                    "Детализированные правила уменьшения и возврата обеспечения исполнения контракта с учетом законодательных требований"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T20:24:40.367Z",
+                "is_skipped_zip": true
+            },
+            {
+                "id": "344",
+                "object_number": "0872500002325000056",
+                "attachment_id": "126",
+                "doc_kind_code": "POD",
+                "summary": "Закупка моторного топлива (бензин АИ-92, АИ-95, дизель К5) с поставкой топливных карт в СПб и ЛО в 2026 году, с контролем по топливным картам, требованиями к качеству по ГОСТ, непрерывной поставкой и подтверждением качества.",
+                "key_requirements": [
+                    "Наличие интернет-сайта с личным кабинетом для контроля заправок",
+                    "Обеспечение бесперебойной круглосуточной поставки топлива",
+                    "Предоставление топливных карт с микросхемой и PIN-кодом, номераными",
+                    "Блокировка утерянных карт в течение 4 часов, перенос ресурсов на новые карты",
+                    "Соответствие топлива нормативам ГОСТ Р 51105-2020, ГОСТ 32513-2013, ГОСТ Р 51866-2002, ГОСТ Р 52368-2005",
+                    "Предоставление паспортов качества и сертификатов на нефтепродукты",
+                    "Наличие АЗС во всех районах СПб и ЛО, с обязательным наличием всех видов топлива"
+                ],
+                "key_terms": {
+                    "payment_type": null,
+                    "delivery_days": "с 01.01.2026 по 31.12.2026",
+                    "warranty_months": null,
+                    "quality_standard": "ГОСТ Р 51105-2020, ГОСТ 32513-2013, ГОСТ Р 51866-2002, ГОСТ Р 52368-2005",
+                    "guarantee_percent": null
+                },
+                "estimated_complexity": 4,
+                "risk_flags": [
+                    "Сложность контроля и управления поставками через топливные карты",
+                    "Требование наличия всех видов топлива на каждой АЗС может ограничить количество поставщиков",
+                    "Обязательное круглосуточное обеспечение поставок повышает риски срывов",
+                    "Не установлены условия оплаты и размер обеспечения",
+                    "Возможные трудности с подтверждением соответствия топлива из-за недостатков КТРУ"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T20:24:48.090Z",
+                "is_skipped_zip": true
+            },
+            {
+                "id": "386",
+                "object_number": "0872500002325000056",
+                "attachment_id": "127",
+                "doc_kind_code": "CAR",
+                "summary": "Документ устанавливает требования к содержанию и составу заявки на участие в закупке по 44-ФЗ, включая перечень обязательных документов, подтверждающих соответствие участника и характеристик товара, а также правила заполнения заявки и порядок предоставления документов на иностранном языке.",
+                "key_requirements": [
+                    "Документы по подпунктам а - л пункта 1 части 1 статьи 43 44-ФЗ",
+                    "Документы, подтверждающие соответствие дополнительным требованиям по статье 31 части 2 или 2.1 44-ФЗ",
+                    "Документы по подпунктам м, о, п пункта 1 части 1 статьи 43 44-ФЗ",
+                    "Документы об обеспечении заявки для участников из стран ЕАЭС, кроме РФ",
+                    "Соответствие характеристикам объекта закупки по части 2 статьи 33 44-ФЗ"
+                ],
+                "key_terms": {
+                    "payment_type": null,
+                    "delivery_days": null,
+                    "warranty_months": null,
+                    "quality_standard": null,
+                    "guarantee_percent": null
+                },
+                "estimated_complexity": 3,
+                "risk_flags": [
+                    "Необходимость представления большого объема документов по разным пунктам 44-ФЗ",
+                    "Возможное несоответствие или удаленность информации из реестра участников и ЕИС",
+                    "Требования к точному указанию показателей товара с конкретными значениями",
+                    "Потенциальные сложности с подтверждением обеспечения заявки поручителями из стран ЕАЭС",
+                    "Риски ошибок при переводе документов на русский язык — приоритет перевода над оригиналом"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T20:36:30.472Z",
+                "is_skipped_zip": true
+            },
+            {
+                "id": "419",
+                "object_number": "0872500002325000056",
+                "attachment_id": "239",
+                "doc_kind_code": "AD",
+                "summary": "Документ подтверждает прохождение финансового контроля по части 5 статьи 99 Федерального закона №44-ФЗ для государственного казенного учреждения Санкт-Петербурга 'Аварийно-спасательная служба'.",
+                "key_requirements": [],
+                "key_terms": {
+                    "payment_type": null,
+                    "delivery_days": null,
+                    "warranty_months": null,
+                    "quality_standard": null,
+                    "guarantee_percent": null
+                },
+                "estimated_complexity": 2,
+                "risk_flags": [
+                    "Отсутствуют конкретные требования и условия исполнения контракта в документе",
+                    "Нет информации о гарантийных обязательствах и сроках поставки",
+                    "Документ носит формальный характер подтверждения финансового контроля, не раскрывая подробностей исполнения"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T20:49:19.222Z",
+                "is_skipped_zip": true
+            },
+            {
+                "id": "451",
+                "object_number": "0872500002325000056",
+                "attachment_id": "128",
+                "doc_kind_code": "AD",
+                "summary": "Документ подтверждает прохождение финансового контроля Комитетом финансов Санкт-Петербурга для государственного казенного учреждения 'Аварийно-спасательная служба' в рамках требований части 5 статьи 99 44-ФЗ.",
+                "key_requirements": [],
+                "key_terms": {
+                    "payment_type": null,
+                    "delivery_days": null,
+                    "warranty_months": null,
+                    "quality_standard": null,
+                    "guarantee_percent": null
+                },
+                "estimated_complexity": 2,
+                "risk_flags": [
+                    "Отсутствие конкретных условий исполнения и требований к участникам закупки",
+                    "Документ подтверждает лишь факт прохождения финансового контроля, не раскрывая содержания и условий закупки"
+                ],
+                "llm_model": null,
+                "llm_used_tokens": null,
+                "processed_at": "2025-11-30T20:56:15.067Z",
+                "is_skipped_zip": true
+            }
+        ],
+        "analytics": {
+            "id": "12",
+            "object_number": "0872500002325000056",
+            "avg_position_complexity": null,
+            "positions_with_foreign_ban": null,
+            "positions_with_subcontractor_req": null,
+            "has_strict_quality_requirements": true,
+            "has_impossible_deadlines": true,
+            "has_payment_guarantees_req": true,
+            "has_technical_audit_req": false,
+            "risk_score": "8.50",
+            "risk_reasons": [
+                "Контракт требует круглосуточной бесперебойной поставки топлива через сеть АЗС по всему Санкт-Петербургу и Ленинградской области, что ограничивает круг потенциальных поставщиков крупными сетями.",
+                "Чрезвычайно сжатые сроки реагирования на инциденты (например, блокировка карты при утере — 15 минут согласно одному документу, 4 часа другому) создают высокий операционный риск для поставщика.",
+                "Требование обеспечения исполнения контракта в размере 10% является существенным финансовым бременем при работе с минимальной маржинальностью на топливе.",
+                "Наличие множества документов с противоречивыми или разными сроками блокировки карт (15 минут, 4 часа) может привести к спорам."
+            ],
+            "recommendation_text": "Высокий операционный и финансовый риск из-за жёстких требований к покрытию АЗС и срокам реагирования. Закупка явно адаптирована под крупного игрока с развитой сетью. Рекомендуется тщательно проанализировать возможность выполнения логистических требований и требований по оперативности блокировки карт.",
+            "estimated_winner_type": "specific_supplier",
+            "analyzed_at": "2025-11-28T23:22:23.914Z",
+            "items_analysis": "Предмет закупки — поставка нефтепродуктов (Дизельное топливо К5) по топливным картам. Требования к качеству товара жёсткие, регламентированы ГОСТами (ГОСТ 32513-2013, ГОСТ Р 51105-2020) и экологическим классом К5. Требования к качеству товара нормальны для подобных закупок. Однако главная «заточка» — логистическая и операционная: обязательное наличие АЗС во всех районах СПб и ЛО, а также нереальные сроки реакции на утерю карт (15 минут/4 часа). Это делает закупку доступной только для 1-2 крупнейших топливных операторов региона, что является признаком ограничения конкуренции."
+        }
+    }

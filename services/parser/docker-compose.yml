@@ -1,0 +1,32 @@
+services:
+  worker-ingest:
+    build: .
+    command: npm run start:worker-ingest
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./config:/app/config:ro
+    networks:
+      - localai_default
+  worker-docs:
+    build: .
+    command: npm run start:worker-docs
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./config:/app/config:ro
+    networks:
+      - localai_default
+  worker-analytics:
+    build: .
+    command: npm run start:worker-analytics
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./config:/app/config:ro
+    networks:
+      - localai_default
+
+networks:
+  localai_default:
+    external: true
