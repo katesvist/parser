@@ -1,0 +1,73 @@
+services:
+  parser-api:
+    image: node:18-alpine
+    container_name: parser-api
+    working_dir: /app
+    restart: unless-stopped
+    env_file:
+      - ../services/api/.env
+    volumes:
+      - ../services/api:/app
+    command: ["node", "api.js"]
+    ports:
+      - "${API_PORT:-8787}:8787"
+    networks:
+      - stack
+
+  docling:
+    image: ${DOCLING_IMAGE:-ghcr.io/docling-project/docling-serve-cpu}
+    container_name: docling
+    restart: unless-stopped
+    environment:
+      DOCLING_SERVE_ENABLE_UI: 1
+      DOCLING_SERVE_ENABLE_REMOTE_SERVICES: ${DOCLING_SERVE_ENABLE_REMOTE_SERVICES:-true}
+      DOCLING_SERVE_LOAD_MODELS_AT_BOOT: ${DOCLING_SERVE_LOAD_MODELS_AT_BOOT:-false}
+      DOCLING_DEVICE: ${DOCLING_DEVICE:-cpu}
+    shm_size: 1g
+    networks:
+      - stack
+
+  parser-worker-ingest:
+    build:
+      context: ../services/parser
+    command: npm run start:worker-ingest
+    restart: unless-stopped
+    env_file:
+      - ../services/parser/.env
+    volumes:
+      - ../services/parser/config:/app/config:ro
+    depends_on:
+      - docling
+    networks:
+      - stack
+
+  parser-worker-docs:
+    build:
+      context: ../services/parser
+    command: npm run start:worker-docs
+    restart: unless-stopped
+    env_file:
+      - ../services/parser/.env
+    volumes:
+      - ../services/parser/config:/app/config:ro
+    depends_on:
+      - docling
+    networks:
+      - stack
+
+  parser-worker-analytics:
+    build:
+      context: ../services/parser
+    command: npm run start:worker-analytics
+    restart: unless-stopped
+    env_file:
+      - ../services/parser/.env
+    volumes:
+      - ../services/parser/config:/app/config:ro
+    networks:
+      - stack
+
+networks:
+  stack:
+    external: true
+    name: ${STACK_NETWORK:-tender-stack_default}

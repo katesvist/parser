@@ -51,12 +51,16 @@ if [[ ! -f "$ROOT_DIR/frontend/source/.env.example" && -f "$ROOT_DIR/frontend/so
 fi
 
 # Create .env files from templates.
+copy_if_missing "$ROOT_DIR/env/stack.env.example" "$ROOT_DIR/env/stack.env"
 copy_if_missing "$ROOT_DIR/services/api/.env.example" "$ROOT_DIR/services/api/.env"
 copy_if_missing "$ROOT_DIR/services/parser/.env.example" "$ROOT_DIR/services/parser/.env"
 copy_if_missing "$ROOT_DIR/frontend/source/.env.example" "$ROOT_DIR/frontend/source/.env"
+copy_if_missing "$ROOT_DIR/infra/supabase/docker/.env.example" "$ROOT_DIR/infra/supabase/docker/.env"
 
 # Ensure keywords config exists (ingest depends on this file path in env).
 ensure_file_if_missing "$ROOT_DIR/services/parser/config/keywords.json" "[]"
+mkdir -p "$ROOT_DIR/infra/supabase/docker/volumes/db/data"
+mkdir -p "$ROOT_DIR/infra/supabase/docker/volumes/storage"
 
 cat <<'OUT'
 
@@ -64,6 +68,8 @@ Bootstrap completed.
 
 Next step:
 1) Fill real values in:
+   - env/stack.env
+   - infra/supabase/docker/.env
    - services/api/.env
    - services/parser/.env
    - frontend/source/.env
@@ -71,4 +77,7 @@ Next step:
    - VITE_API_BASE
    - CORS_ORIGINS
    - SUPABASE_REST_URL / SUPABASE_SERVICE_ROLE_KEY
+3) Generate strong Supabase keys/passwords:
+   - cd infra/supabase/docker
+   - ./utils/generate-keys.sh
 OUT

@@ -15,9 +15,12 @@
 - `frontend/source` — исходники фронта
 - `frontend/build` — собранный фронт-бандл (`index.html` + `/assets`)
 - `database/postgres_schema_only.sql` — структура БД без данных (`pg_dump --schema-only`)
+- `infra/supabase/docker` — локальный Supabase/Postgres stack (compose + init SQL + kong/vector config)
 - `infra/docker-compose.prod.snapshot.yml` — снапшот compose с прода
 - `infra/docker-compose.n8n-workers.snapshot.yml` — снапшот n8n workers
 - `infra/Caddyfile.snapshot` — снапшот Caddy
+- `compose/stack.app.yml` — app-слой (`parser-api`, `docling`, `worker-ingest`, `worker-docs`, `worker-analytics`)
+- `env/stack.env.example` — общие параметры стека (project/network/ports/domains)
 
 ## Быстрый bootstrap env
 ```bash
@@ -26,7 +29,41 @@ chmod +x scripts/bootstrap-env.sh
 ```
 
 Скрипт создаёт:
+- `env/stack.env` из `env/stack.env.example`
+- `infra/supabase/docker/.env` из `infra/supabase/docker/.env.example`
 - `services/api/.env` из `services/api/.env.example`
 - `services/parser/.env` из `services/parser/.env.example`
 - `frontend/source/.env` из `frontend/source/.env.example`
 - `services/parser/config/keywords.json` (если отсутствует)
+
+## Разворот backend на новом сервере (без данных)
+```bash
+git clone git@github.com:katesvist/parser.git
+cd parser
+
+chmod +x scripts/*.sh
+./scripts/bootstrap-env.sh
+```
+
+Заполнить реальные значения в:
+- `env/stack.env`
+- `infra/supabase/docker/.env`
+- `services/api/.env`
+- `services/parser/.env`
+
+Запуск:
+```bash
+./scripts/up-supabase.sh
+./scripts/apply-db-schema.sh
+./scripts/up-app.sh
+./scripts/healthcheck.sh
+```
+
+## Важно по сетям
+- По умолчанию `PROJECT_NAME=tender-stack`.
+- По умолчанию `STACK_NETWORK=tender-stack_default`.
+- App-слой подключается в эту же сеть, чтобы видеть Supabase/Kong/Postgres.
+
+## Что не хранится в репо
+- runtime-данные PostgreSQL (`infra/supabase/docker/volumes/db/data`) не включаются;
+- в репо только структура БД (`database/postgres_schema_only.sql`) и миграции.
