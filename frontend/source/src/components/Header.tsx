@@ -10,6 +10,7 @@ import {
   LineChart,
   FileText,
   PlusCircle,
+  LogOut,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -44,7 +45,7 @@ const moduleItems = [
   { id: 'other', label: 'Еще что-нибудь', icon: PlusCircle },
 ] as const;
 
-export function Header({ onNavigate, currentPage, userName }: HeaderProps) {
+export function Header({ onNavigate, onLogout, currentPage, userName }: HeaderProps) {
   const displayName = (userName || '').trim() || 'Пользователь';
   const initials = getInitials(displayName);
 
@@ -125,6 +126,15 @@ export function Header({ onNavigate, currentPage, userName }: HeaderProps) {
             </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={onLogout}
+          className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#b7c0cc] bg-[#d6dde6] text-[14px] font-semibold text-[#4e5663] hover:bg-[#dfe5ed]"
+        >
+          <LogOut className="h-4 w-4" />
+          Выйти
+        </button>
       </aside>
 
       <div className="sticky top-0 z-50 border-b border-[#dbe1ea] bg-[#f0f2f7] px-3 py-2 md:hidden">
@@ -153,6 +163,14 @@ export function Header({ onNavigate, currentPage, userName }: HeaderProps) {
               );
             })}
         </div>
+        <button
+          type="button"
+          onClick={onLogout}
+          className="mt-2 inline-flex h-9 items-center gap-2 rounded-full border border-[#c9d4e0] bg-white px-3 text-[13px] text-[#4e5663]"
+        >
+          <LogOut className="h-3.5 w-3.5" />
+          Выйти
+        </button>
       </div>
     </>
   );

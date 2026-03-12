@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { AlertCircle, ArrowRight, Clock3, Eye, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
-import { AlertCircle, ArrowRight, Clock3, Sparkles } from 'lucide-react';
+import { Badge } from './ui/badge';
 import { useTenders } from '../context/TendersContext';
-import { formatCurrency, decodeHtmlEntities, getTenderDisplayTitle } from '../types/tender';
 import { apiRequest } from '../lib/api';
+import { loadTenderDetailsMap } from '../lib/tender-details';
+import { decodeHtmlEntities, formatCurrency, formatDate, getTenderDisplayTitle, type Tender } from '../types/tender';
 
 type DashboardPage =
   | 'dashboard'
@@ -18,6 +20,14 @@ interface DashboardProps {
   onNavigate: (page: DashboardPage, tenderId?: string) => void;
 }
 
+type KanbanRow = { object_number: string; status: string };
+type FavoriteRow = { object_number: string };
+type AssignmentRow = {
+  object_number: string;
+  specialist_name?: string | null;
+  lawyer_name?: string | null;
+};
+
 type IndustryStat = {
   code: string;
   name: string;
@@ -26,9 +36,52 @@ type IndustryStat = {
   share: number;
 };
 
-type KanbanRow = { object_number: string; status: string };
+type TeamMember = {
+  name: string;
+  role: string;
+  count: number;
+};
+
+type DeadlineGroup = {
+  key: 'lt2' | 'lt5' | 'lt7';
+  label: string;
+  max: number;
+  accent: string;
+  border: string;
+  bg: string;
+};
 
 const OKPD_PATTERN = /(\d{2}(?:\.\d{1,3}){1,3})/;
+
+const DEADLINE_GROUPS: DeadlineGroup[] = [
+  {
+    key: 'lt2',
+    label: 'Менее 2 дней',
+    max: 2,
+    accent: '#e54c4c',
+    border: '#efb0b0',
+    bg: '#fff8f8',
+  },
+  {
+    key: 'lt5',
+    label: 'Менее 5 дней',
+    max: 5,
+    accent: '#da8530',
+    border: '#f0c28f',
+    bg: '#fffbf5',
+  },
+  {
+    key: 'lt7',
+    label: 'Менее 7 дней',
+    max: 7,
+    accent: '#4c7fdf',
+    border: '#b9ccf3',
+    bg: '#f7faff',
+  },
+];
+
+const INDUSTRY_COLORS = ['#101218', '#ef4d1f', '#4a93d8', '#9aa7c0', '#667da5'];
+const TEAM_COLORS = ['#4a93d8', '#26b36a', '#7c4dff', '#e85b45', '#8f9aa8'];
 
 function normalizeOkpdGroup(codeRaw: string) {
   const parts = codeRaw
@@ -93,6 +146,18 @@ function daysLeft(enddt?: string | null) {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
+function sameDay(dateRaw?: string | null) {
+  if (!dateRaw) return false;
+  const date = new Date(dateRaw);
+  if (Number.isNaN(date.getTime())) return false;
+  const now = new Date();
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  );
+}
+
 function formatPriceCompact(amount: number) {
   if (!Number.isFinite(amount)) return '0';
   if (amount >= 1_000_000_000) return `${(amount / 1_000_000_000).toFixed(1)}B`;
@@ -100,12 +165,191 @@ function formatPriceCompact(amount: number) {
   return `${Math.round(amount).toLocaleString('ru-RU')}`;
 }
 
+function getInitials(name: string) {
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2);
+  if (!parts.length) return 'П';
+  return parts.map((part) => part[0]?.toUpperCase() || '').join('');
+}
+
 export function Dashboard({ onNavigate }: DashboardProps) {
   const { tenders, loading, error, refresh } = useTenders();
-  const [favoritesCount, setFavoritesCount] = useState(0);
-  const [kanbanRows, setKanbanRows] = useState<KanbanRow[]>([]);
 
-  const activeCount = useMemo(
+  const [favoritesRows, setFavoritesRows] = useState<FavoriteRow[]>([]);
+  const [kanbanRows, setKanbanRows] = useState<KanbanRow[]>([]);
+  const [assignmentRows, setAssignmentRows] = useState<AssignmentRow[]>([]);
+  const [profileStaff, setProfileStaff] = useState<{ specialists: string[]; lawyers: string[] }>({
+    specialists: [],
+    lawyers: [],
+  });
+
+  const [trackedDetails, setTrackedDetails] = useState<Record<string, Tender>>({});
+  const [trackedDetailsLoading, setTrackedDetailsLoading] = useState(false);
+  const unresolvedTrackedRef = useRef<Set<string>>(new Set());
+
+  const tendersByObject = useMemo(() => {
+    const map: Record<string, Tender> = {};
+    tenders.forEach((tender) => {
+      map[tender.object_number] = tender;
+    });
+    return map;
+  }, [tenders]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadUserData = async () => {
+      try {
+        const [favoritesRes, kanbanRes, assignmentsRes, profileRes] = await Promise.allSettled([
+          apiRequest<FavoriteRow[]>('favorites'),
+          apiRequest<KanbanRow[]>('kanban'),
+          apiRequest<AssignmentRow[]>('assignments'),
+          apiRequest<{
+            staff_specialists?: string[];
+            staff_lawyers?: string[];
+          }>('profile'),
+        ]);
+
+        if (!mounted) return;
+
+        setFavoritesRows(
+          favoritesRes.status === 'fulfilled' && Array.isArray(favoritesRes.value)
+            ? favoritesRes.value
+            : [],
+        );
+
+        setKanbanRows(
+          kanbanRes.status === 'fulfilled' && Array.isArray(kanbanRes.value)
+            ? kanbanRes.value
+            : [],
+        );
+
+        setAssignmentRows(
+          assignmentsRes.status === 'fulfilled' && Array.isArray(assignmentsRes.value)
+            ? assignmentsRes.value
+            : [],
+        );
+
+        if (profileRes.status === 'fulfilled' && profileRes.value) {
+          const specialists = Array.isArray(profileRes.value.staff_specialists)
+            ? profileRes.value.staff_specialists.filter((v) => typeof v === 'string' && v.trim())
+            : [];
+          const lawyers = Array.isArray(profileRes.value.staff_lawyers)
+            ? profileRes.value.staff_lawyers.filter((v) => typeof v === 'string' && v.trim())
+            : [];
+          setProfileStaff({ specialists, lawyers });
+        } else {
+          setProfileStaff({ specialists: [], lawyers: [] });
+        }
+      } catch {
+        if (!mounted) return;
+        setFavoritesRows([]);
+        setKanbanRows([]);
+        setAssignmentRows([]);
+        setProfileStaff({ specialists: [], lawyers: [] });
+      }
+    };
+
+    void loadUserData();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const trackedIds = useMemo(() => {
+    const ids = new Set<string>();
+    favoritesRows.forEach((row) => {
+      if (row?.object_number) ids.add(row.object_number);
+    });
+    kanbanRows.forEach((row) => {
+      if (row?.object_number) ids.add(row.object_number);
+    });
+    return Array.from(ids);
+  }, [favoritesRows, kanbanRows]);
+
+  useEffect(() => {
+    const activeIds = new Set(trackedIds);
+    unresolvedTrackedRef.current = new Set(
+      Array.from(unresolvedTrackedRef.current).filter((id) => activeIds.has(id)),
+    );
+
+    setTrackedDetails((prev) => {
+      let changed = false;
+      const next: Record<string, Tender> = {};
+      for (const [id, tender] of Object.entries(prev)) {
+        if (activeIds.has(id)) {
+          next[id] = tender;
+        } else {
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [trackedIds]);
+
+  const missingTrackedIds = useMemo(() => {
+    return trackedIds.filter(
+      (id) => !tendersByObject[id] && !trackedDetails[id] && !unresolvedTrackedRef.current.has(id),
+    );
+  }, [trackedIds, tendersByObject, trackedDetails]);
+
+  useEffect(() => {
+    if (!missingTrackedIds.length) {
+      setTrackedDetailsLoading(false);
+      return;
+    }
+
+    let active = true;
+    setTrackedDetailsLoading(true);
+
+    (async () => {
+      const loaded = await loadTenderDetailsMap(missingTrackedIds);
+      if (!active) return;
+
+      const loadedIds = new Set(Object.keys(loaded));
+      for (const id of missingTrackedIds) {
+        if (!loadedIds.has(id)) unresolvedTrackedRef.current.add(id);
+      }
+
+      if (loadedIds.size > 0) {
+        setTrackedDetails((prev) => ({ ...prev, ...loaded }));
+      }
+      setTrackedDetailsLoading(false);
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [missingTrackedIds]);
+
+  const trackedTenders = useMemo(() => {
+    return trackedIds
+      .map((id) => tendersByObject[id] ?? trackedDetails[id])
+      .filter((tender): tender is Tender => Boolean(tender));
+  }, [trackedIds, tendersByObject, trackedDetails]);
+
+  const kanbanByStatus = useMemo(() => {
+    const groups: Record<string, string[]> = {
+      backlog: [],
+      in_progress: [],
+      docs: [],
+      review: [],
+      done: [],
+    };
+
+    kanbanRows.forEach((row) => {
+      if (!row?.object_number || !row?.status) return;
+      if (!groups[row.status]) groups[row.status] = [];
+      groups[row.status].push(row.object_number);
+    });
+
+    return groups;
+  }, [kanbanRows]);
+
+  const openStatusCount = useMemo(
     () =>
       tenders.filter(
         (tender) =>
@@ -117,71 +361,93 @@ export function Dashboard({ onNavigate }: DashboardProps) {
     [tenders],
   );
 
-  const totalAmount = useMemo(() => tenders.reduce((sum, tender) => sum + (tender.maxprice ?? 0), 0), [tenders]);
+  const newTodayCount = useMemo(() => {
+    const today = tenders.filter((tender) => sameDay(tender.startdt)).length;
+    return today > 0 ? today : openStatusCount;
+  }, [tenders, openStatusCount]);
 
-  const expiringSoon = useMemo(() => {
-    return tenders
-      .map((tender) => ({ tender, left: daysLeft(tender.enddt) }))
-      .filter((item) => item.left !== null && item.left >= 0 && item.left <= 7)
-      .sort((a, b) => (a.left ?? 0) - (b.left ?? 0))
-      .slice(0, 8);
-  }, [tenders]);
+  const kanbanNotInWork = useMemo(
+    () =>
+      kanbanRows.filter((row) => !['in_progress', 'docs', 'review'].includes((row.status || '').toLowerCase()))
+        .length,
+    [kanbanRows],
+  );
 
-  useEffect(() => {
-    let mounted = true;
-    const loadUserStats = async () => {
-      try {
-        const [favoritesRows, kanban] = await Promise.all([
-          apiRequest<Array<{ object_number: string }>>('favorites'),
-          apiRequest<Array<{ object_number: string; status: string }>>('kanban'),
-        ]);
-        if (!mounted) return;
-        setFavoritesCount((favoritesRows || []).length);
-        setKanbanRows(Array.isArray(kanban) ? kanban : []);
-      } catch {
-        if (!mounted) return;
-        setFavoritesCount(0);
-        setKanbanRows([]);
-      }
-    };
-    void loadUserStats();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const urgentCount = useMemo(
+    () => trackedTenders.filter((tender) => {
+      const left = daysLeft(tender.enddt);
+      return left !== null && left >= 0 && left <= 5;
+    }).length,
+    [trackedTenders],
+  );
 
-  const kanbanByStatus = useMemo(() => {
-    const groups: Record<string, string[]> = {
-      backlog: [],
-      in_progress: [],
-      docs: [],
-      review: [],
-      done: [],
-    };
+  const inWorkAmount = useMemo(() => {
+    const workStatuses = new Set(['in_progress', 'docs', 'review']);
+    const inWorkIds = new Set(
+      kanbanRows
+        .filter((row) => workStatuses.has((row.status || '').toLowerCase()))
+        .map((row) => row.object_number),
+    );
 
-    for (const row of kanbanRows) {
-      if (!row?.object_number || !row?.status) continue;
-      if (!groups[row.status]) groups[row.status] = [];
-      groups[row.status].push(row.object_number);
-    }
-    return groups;
-  }, [kanbanRows]);
+    const byIds = Array.from(inWorkIds)
+      .map((id) => tendersByObject[id] ?? trackedDetails[id])
+      .filter((tender): tender is Tender => Boolean(tender));
 
-  const previewColumns = useMemo(
+    const source = byIds.length > 0 ? byIds : trackedTenders;
+    return source.reduce((sum, tender) => sum + (tender.maxprice ?? 0), 0);
+  }, [kanbanRows, tendersByObject, trackedDetails, trackedTenders]);
+
+  const dashboardColumns = useMemo(
     () => [
-      { id: 'backlog', label: 'АНАЛИЗ', accent: '#6f7787' },
-      { id: 'in_progress', label: 'ПОДГОТОВКА', accent: '#4c7fdf' },
-      { id: 'docs', label: 'ПОДАНО', accent: '#dd7d39' },
-      { id: 'done', label: 'РЕЗУЛЬТАТ', accent: '#4fb37e' },
+      { id: 'backlog', label: 'АНАЛИЗ', accent: '#6f7787', statuses: ['backlog'] },
+      { id: 'in_progress', label: 'ПОДГОТОВКА', accent: '#4c7fdf', statuses: ['in_progress'] },
+      { id: 'docs', label: 'ПОДАНО', accent: '#dd7d39', statuses: ['docs', 'review'] },
+      { id: 'done', label: 'РЕЗУЛЬТАТ', accent: '#4fb37e', statuses: ['done'] },
     ],
     [],
   );
 
+  const miniKanbanData = useMemo(() => {
+    return dashboardColumns.map((column) => {
+      const ids = column.statuses.flatMap((status) => kanbanByStatus[status] || []);
+      const tendersList = ids
+        .map((id) => tendersByObject[id] ?? trackedDetails[id])
+        .filter((tender): tender is Tender => Boolean(tender));
+
+      return {
+        ...column,
+        count: ids.length,
+        tenders: tendersList.slice(0, 4),
+      };
+    });
+  }, [dashboardColumns, kanbanByStatus, tendersByObject, trackedDetails]);
+
+  const deadlineSections = useMemo(() => {
+    const candidates = trackedTenders
+      .map((tender) => ({ tender, left: daysLeft(tender.enddt) }))
+      .filter((entry) => entry.left !== null && entry.left >= 0 && entry.left <= 7)
+      .sort((a, b) => (a.left ?? 0) - (b.left ?? 0));
+
+    return DEADLINE_GROUPS.map((group, index) => {
+      const previousMax = index === 0 ? 0 : DEADLINE_GROUPS[index - 1].max;
+      const items = candidates.filter((entry) => {
+        const left = entry.left ?? 99;
+        return left <= group.max && left > previousMax;
+      });
+      return {
+        ...group,
+        items,
+      };
+    }).filter((group) => group.items.length > 0);
+  }, [trackedTenders]);
+
   const topIndustries = useMemo(() => {
     const map = new Map<string, IndustryStat>();
+
     for (const tender of tenders) {
       const parsed = resolveTenderOkpd(tender as unknown as Record<string, unknown>);
       if (!parsed) continue;
+
       const current = map.get(parsed.code) ?? {
         code: parsed.code,
         name: parsed.name,
@@ -189,6 +455,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         amount: 0,
         share: 0,
       };
+
       current.count += 1;
       current.amount += tender.maxprice ?? 0;
       if (!current.name && parsed.name) current.name = parsed.name;
@@ -196,16 +463,79 @@ export function Dashboard({ onNavigate }: DashboardProps) {
     }
 
     const sorted = Array.from(map.values()).sort((a, b) => b.amount - a.amount || b.count - a.count);
-    const amountTotal = sorted.reduce((sum, item) => sum + item.amount, 0);
+    const total = sorted.reduce((sum, item) => sum + item.amount, 0);
 
     return sorted.slice(0, 5).map((item) => ({
       ...item,
-      share: amountTotal > 0 ? Number(((item.amount / amountTotal) * 100).toFixed(1)) : 0,
+      share: total > 0 ? Number(((item.amount / total) * 100).toFixed(1)) : 0,
     }));
   }, [tenders]);
 
+  const topIndustryLegend = useMemo(() => {
+    return topIndustries.map((item, index) => ({
+      ...item,
+      color: INDUSTRY_COLORS[index % INDUSTRY_COLORS.length],
+      label: item.name || `ОКПД ${item.code}`,
+    }));
+  }, [topIndustries]);
+
+  const donutBackground = useMemo(() => {
+    if (!topIndustryLegend.length) return 'conic-gradient(#d8dee7 0deg 360deg)';
+
+    let start = 0;
+    const segments: string[] = [];
+
+    topIndustryLegend.forEach((item) => {
+      const sweep = Math.max(0, Math.min(100, item.share)) * 3.6;
+      const end = Math.min(360, start + sweep);
+      segments.push(`${item.color} ${start.toFixed(2)}deg ${end.toFixed(2)}deg`);
+      start = end;
+    });
+
+    if (start < 360) {
+      segments.push(`#d8dee7 ${start.toFixed(2)}deg 360deg`);
+    }
+
+    return `conic-gradient(${segments.join(',')})`;
+  }, [topIndustryLegend]);
+
+  const teamMembers = useMemo(() => {
+    const members = new Map<string, TeamMember>();
+
+    for (const name of profileStaff.specialists) {
+      members.set(name, { name, role: 'Тендерный специалист', count: 0 });
+    }
+    for (const name of profileStaff.lawyers) {
+      members.set(name, {
+        name,
+        role: members.get(name)?.role || 'Юрист',
+        count: members.get(name)?.count || 0,
+      });
+    }
+
+    for (const row of assignmentRows) {
+      const specialist = (row.specialist_name || '').trim();
+      const lawyer = (row.lawyer_name || '').trim();
+
+      if (specialist) {
+        const prev = members.get(specialist) || { name: specialist, role: 'Тендерный специалист', count: 0 };
+        members.set(specialist, { ...prev, count: prev.count + 1 });
+      }
+
+      if (lawyer) {
+        const prev = members.get(lawyer) || { name: lawyer, role: 'Юрист', count: 0 };
+        members.set(lawyer, { ...prev, role: 'Юрист', count: prev.count + 1 });
+      }
+    }
+
+    return Array.from(members.values())
+      .filter((member) => member.name.trim())
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'ru'))
+      .slice(0, 5);
+  }, [assignmentRows, profileStaff]);
+
   return (
-    <div className="space-y-5">
+    <div className="mx-auto w-full max-w-[1251px] space-y-5">
       {error ? (
         <div className="surface-card flex items-start gap-3 border-[#f4b08a] bg-[#fff4eb] px-4 py-3 text-[#b74f16]">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -218,126 +548,169 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <div className="soft-card px-4 py-3">
-          <div className="text-[14px] text-[#3d4350]">Новых за сегодня</div>
-          <div className="mt-1 flex items-end justify-between">
-            <div className="text-[24px] leading-7 font-extrabold text-[#1d202c]">{activeCount}</div>
-            <div className="text-[12px] text-[#6b7280]">+11.7%</div>
-          </div>
-        </div>
-        <div className="soft-card px-4 py-3">
-          <div className="text-[14px] text-[#3d4350]">В избранном</div>
-          <div className="mt-1 flex items-end justify-between">
-            <div className="text-[24px] leading-7 font-extrabold text-[#1d202c]">{favoritesCount}</div>
-            <div className="text-right text-[12px] leading-4 text-[#6b7280]">
-              в канбане: {kanbanRows.length}
-            </div>
-          </div>
-        </div>
-        <div className="soft-card px-4 py-3">
-          <div className="text-[14px] text-[#3d4350]">Срок подачи &lt;5 дней</div>
-          <div className="mt-1 flex items-end justify-between">
-            <div className="text-[24px] leading-7 font-extrabold text-[#1d202c]">{expiringSoon.filter((item) => (item.left ?? 10) <= 5).length}</div>
-            <div className="text-right text-[12px] leading-4 text-[#ef4d1f]">требуют действий!</div>
-          </div>
-        </div>
-        <div className="soft-card px-4 py-3">
-          <div className="text-[14px] text-[#3d4350]">Сумма в работе</div>
-          <div className="mt-1 flex items-end justify-between">
-            <div className="text-[24px] leading-7 font-extrabold text-[#1d202c]">{formatPriceCompact(totalAmount)}</div>
-            <div className="text-[12px] text-[#6b7280]">+8.01%</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="min-w-0 space-y-4">
-          <section className="surface-card p-3">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[24px] font-extrabold text-[#303744]">Канбан-доска тендеров</h2>
-              <Button
-                type="button"
-                onClick={() => onNavigate('kanban')}
-                className="h-10 rounded-full bg-[#2da36b] px-5 text-[14px] font-bold text-white hover:bg-[#248e5c]"
-              >
-                Канбан <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,901px)_330px]">
+        <div className="min-w-0 space-y-5">
+          <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="soft-card px-5 py-4">
+              <div className="text-[14px] font-bold text-[#3d4350]">Новых за сегодня</div>
+              <div className="mt-2 flex items-end justify-between">
+                <div className="text-[44px] leading-8 font-extrabold text-[#1d202c]">{newTodayCount}</div>
+                <div className="text-[12px] text-[#6b7280]">+11.7%</div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-              {previewColumns.map((column) => {
-                const ids = (kanbanByStatus[column.id] || []).slice(0, 4);
-                return (
-                  <div key={column.id} className="rounded-[12px] border border-[#d8dee8] bg-[#f2f5fa] p-2">
-                    <div className="mb-2 flex items-center justify-between">
-                      <div className="text-[10px] font-extrabold uppercase tracking-[0.04em]" style={{ color: column.accent }}>
-                        {column.label}
-                      </div>
-                      <div className="rounded-full bg-[#dde3ea] px-2 py-0.5 text-[10px] font-semibold text-[#5f6773]">{(kanbanByStatus[column.id] || []).length}</div>
-                    </div>
-                    <div className="space-y-2">
-                      {ids.length === 0 ? (
-                        <div className="rounded-[10px] border border-[#e1e5ec] bg-white px-2 py-3 text-[12px] text-[#9096a2]">Нет карточек</div>
-                      ) : (
-                        ids.map((id) => {
-                          const tender = tenders.find((item) => item.object_number === id);
-                          return (
-                            <div key={id} className="rounded-[10px] border border-[#dce1ea] bg-white px-2 py-2">
-                              <div className="mb-1 inline-flex rounded-[5px] bg-[#444b5b] px-1.5 py-0.5 text-[10px] text-white">
-                                {tender?.zakon || '—'}
-                              </div>
-                              <div className="line-clamp-2 text-[12px] leading-4 text-[#2e3340]">{tender ? getTenderDisplayTitle(tender) : `Тендер ${id}`}</div>
-                              <div className="mt-1 flex items-center justify-between text-[12px]">
-                                <span className="font-bold text-[#2e3340]">{tender ? formatCurrency(tender.maxprice, tender.currency_code).replace(' RUB', '') : '—'}</span>
-                                <span className="text-[#9aa1ad]">{tender?.enddt ? new Date(tender.enddt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : ''}</span>
-                              </div>
-                            </div>
-                          );
-                        })
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="soft-card px-5 py-4">
+              <div className="text-[14px] font-bold text-[#3d4350]">Тендеры в канбане</div>
+              <div className="mt-2 flex items-end justify-between gap-2">
+                <div className="text-[44px] leading-8 font-extrabold text-[#1d202c]">{kanbanRows.length}</div>
+                <div className="text-right text-[12px] leading-4 text-[#6b7280]">{kanbanNotInWork} из них не в работе</div>
+              </div>
+            </div>
+
+            <div className="soft-card px-5 py-4">
+              <div className="text-[14px] font-bold text-[#3d4350]">Срок подачи &lt;5 дней</div>
+              <div className="mt-2 flex items-end justify-between gap-2">
+                <div className="text-[44px] leading-8 font-extrabold text-[#1d202c]">{urgentCount}</div>
+                <div className="text-right text-[12px] leading-4 text-[#ef4d1f]">требуют действий!</div>
+              </div>
+            </div>
+
+            <div className="soft-card px-5 py-4">
+              <div className="text-[14px] font-bold text-[#3d4350]">Сумма в работе</div>
+              <div className="mt-2 flex items-end justify-between">
+                <div className="text-[44px] leading-8 font-extrabold text-[#1d202c]">{formatPriceCompact(inWorkAmount)}</div>
+                <div className="text-[12px] text-[#6b7280]">+8.01%</div>
+              </div>
             </div>
           </section>
 
           <section className="surface-card p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[24px] leading-7 font-extrabold text-[#303744]">Топ ОКПД-2 сегментов</h2>
-              <Button type="button" onClick={() => onNavigate('search')} className="h-10 rounded-full bg-[#2da36b] px-5 text-[14px] font-bold text-white hover:bg-[#248e5c]">
-                Все тендеры <ArrowRight className="ml-2 h-4 w-4" />
+              <h2 className="text-[16px] font-extrabold text-[#303744]">Канбан-доска тендеров</h2>
+              <Button
+                type="button"
+                onClick={() => onNavigate('kanban')}
+                className="h-8 rounded-full bg-[#2da36b] px-6 text-[12px] font-bold text-white hover:bg-[#248e5c]"
+              >
+                Канбан <ArrowRight className="ml-2 h-3.5 w-3.5" />
               </Button>
             </div>
 
-            {loading ? (
-              <p className="text-[14px] text-[#8f959f]">Загрузка статистики...</p>
-            ) : topIndustries.length === 0 ? (
-              <p className="text-[14px] text-[#8f959f]">Нет данных по отраслям.</p>
-            ) : (
-              <div className="space-y-2">
-                {topIndustries.map((item) => (
-                  <div key={item.code} className="rounded-[10px] border border-[#dde2ea] bg-[#f7f9fc] px-3 py-2">
-                    <div className="mb-1 flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="text-[14px] font-bold text-[#2f3644]">ОКПД {item.code}</div>
-                        <div className="truncate text-[12px] text-[#767d89]">{item.name || 'Расшифровка не указана'}</div>
-                      </div>
-                      <div className="text-[12px] font-semibold text-[#2f3644]">{item.share.toFixed(1)}%</div>
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
+              {miniKanbanData.map((column) => (
+                <div key={column.id} className="rounded-[12px] border border-[#dbe1ea] bg-[#f4f7fb] p-2">
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="text-[10px] font-extrabold uppercase tracking-[0.04em]" style={{ color: column.accent }}>
+                      {column.label}
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-[#e2e7ef]">
-                      <div className="h-2 rounded-full bg-[#4a8fd6]" style={{ width: `${item.share}%` }} />
-                    </div>
-                    <div className="mt-1 text-[12px] text-[#5f6673]">Сумма: {formatCurrency(item.amount, 'RUB')}</div>
+                    <span className="rounded-full bg-[#dfe4eb] px-2 py-0.5 text-[10px] font-semibold text-[#596171]">
+                      {column.count}
+                    </span>
                   </div>
-                ))}
+
+                  <div className="space-y-2">
+                    {loading || trackedDetailsLoading ? (
+                      <div className="rounded-[10px] border border-[#e1e5ec] bg-white px-2 py-3 text-[12px] text-[#9096a2]">
+                        Загрузка...
+                      </div>
+                    ) : column.tenders.length === 0 ? (
+                      <div className="rounded-[10px] border border-[#e1e5ec] bg-white px-2 py-3 text-[12px] text-[#9096a2]">
+                        Нет карточек
+                      </div>
+                    ) : (
+                      column.tenders.map((tender) => (
+                        <button
+                          key={`${column.id}-${tender.object_number}`}
+                          type="button"
+                          onClick={() => onNavigate('details', tender.object_number)}
+                          className="w-full rounded-[10px] border border-[#dde3eb] bg-white p-2 text-left transition hover:bg-[#f8fbff]"
+                        >
+                          <Badge className="mb-1 rounded-[5px] bg-[#444b5b] px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-[#444b5b]">
+                            {tender.zakon || '—'}
+                          </Badge>
+                          <div className="line-clamp-2 text-[12px] leading-4 text-[#2f3542]">{getTenderDisplayTitle(tender)}</div>
+                          <div className="mt-2 flex items-center justify-between text-[12px]">
+                            <span className="font-bold text-[#2f3643]">{formatCurrency(tender.maxprice, tender.currency_code).replace(' RUB', '')}</span>
+                            <span className="text-[#8f96a2]">{formatDate(tender.enddt)}</span>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="grid grid-cols-1 gap-5 lg:grid-cols-[315px_minmax(0,1fr)]">
+            <div className="surface-card p-4">
+              <h3 className="mb-3 text-[16px] font-extrabold text-[#303744]">Команда</h3>
+
+              {teamMembers.length === 0 ? (
+                <p className="text-[12px] text-[#8f959f]">Список команды пока пуст.</p>
+              ) : (
+                <div className="space-y-3">
+                  {teamMembers.map((member, index) => (
+                    <div key={`${member.name}-${member.role}`} className="flex items-center justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <div
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                          style={{ backgroundColor: TEAM_COLORS[index % TEAM_COLORS.length] }}
+                        >
+                          {getInitials(member.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="truncate text-[12px] font-bold text-[#2f3643]">{member.name}</div>
+                          <div className="truncate text-[10px] text-[#8f96a2]">{member.role}</div>
+                        </div>
+                      </div>
+                      <span className="rounded-[8px] bg-[#dfe4eb] px-2 py-1 text-[10px] font-bold text-[#5f6773]">
+                        {member.count} тенд.
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="surface-card p-4">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h3 className="text-[16px] font-extrabold text-[#303744]">Топ ОКПД-2 сегментов</h3>
+                <Button
+                  type="button"
+                  onClick={() => onNavigate('search')}
+                  className="h-8 rounded-full bg-[#2da36b] px-4 text-[12px] font-bold text-white hover:bg-[#248e5c]"
+                >
+                  Все тендеры <ArrowRight className="ml-2 h-3.5 w-3.5" />
+                </Button>
               </div>
-            )}
+
+              {topIndustryLegend.length === 0 ? (
+                <p className="text-[12px] text-[#8f959f]">Нет данных по отраслям.</p>
+              ) : (
+                <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[190px_minmax(0,1fr)]">
+                  <div className="mx-auto h-[150px] w-[150px] rounded-full" style={{ background: donutBackground }}>
+                    <div className="m-[17px] h-[116px] w-[116px] rounded-full bg-white" />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    {topIndustryLegend.map((item) => (
+                      <div key={item.code} className="flex items-center justify-between gap-2 text-[12px] text-[#2f3643]">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                        <span className="shrink-0">{item.share.toFixed(1)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </section>
         </div>
 
-        <div className="min-w-0 space-y-4">
+        <div className="min-w-0 space-y-5">
           <section className="surface-card overflow-hidden bg-[#1d2234] p-4 text-white">
             <div className="mb-2 flex items-center gap-2 text-[16px] font-bold">
               <Sparkles className="h-4 w-4 text-[#2ebd78]" />
@@ -356,42 +729,57 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </Button>
           </section>
 
-          <section className="surface-card p-3">
-            <h2 className="mb-2 text-[24px] leading-7 font-extrabold text-[#303744]">Ближайшие дедлайны</h2>
-            {expiringSoon.length === 0 ? (
-              <p className="text-[14px] text-[#8f959f]">Пока нет тендеров с дедлайном в ближайшие 7 дней.</p>
+          <section className="surface-card p-4">
+            <h3 className="mb-3 text-[14px] font-extrabold text-[#303744]">Ближайшие дедлайны</h3>
+
+            {deadlineSections.length === 0 ? (
+              <p className="text-[12px] text-[#8f959f]">Нет дедлайнов в избранном и канбане.</p>
             ) : (
-              <div className="space-y-2">
-                {expiringSoon.map(({ tender, left }) => {
-                  const isCritical = (left ?? 100) <= 2;
-                  const isWarning = (left ?? 100) <= 5 && !isCritical;
-                  const color = isCritical ? '#f06565' : isWarning ? '#e39a58' : '#5b85d4';
-                  return (
-                    <button
-                      key={tender.object_number}
-                      type="button"
-                      onClick={() => onNavigate('details', tender.object_number)}
-                      className="w-full rounded-[10px] border bg-white px-2 py-2 text-left"
-                      style={{ borderColor: color }}
-                    >
-                      <div className="line-clamp-1 text-[12px] font-semibold text-[#343b48]">{getTenderDisplayTitle(tender)}</div>
-                      <div className="mt-1 flex items-center justify-between">
-                        <div className="text-[14px] font-bold text-[#2da36b]">{formatCurrency(tender.maxprice, tender.currency_code).replace(' RUB', '')}</div>
-                        <div className="flex items-center gap-1 text-[12px] text-[#7d8592]">
-                          <Clock3 className="h-3.5 w-3.5" />
-                          {left}д
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="space-y-3">
+                {deadlineSections.map((group) => (
+                  <div key={group.key}>
+                    <div className="mb-2 text-[12px] font-bold" style={{ color: group.accent }}>
+                      {group.label}
+                    </div>
+                    <div className="space-y-2">
+                      {group.items.map(({ tender, left }) => (
+                        <button
+                          key={`${group.key}-${tender.object_number}`}
+                          type="button"
+                          onClick={() => onNavigate('details', tender.object_number)}
+                          className="w-full rounded-[10px] border px-2 py-2 text-left transition hover:brightness-[0.99]"
+                          style={{ borderColor: group.border, background: group.bg }}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="line-clamp-1 text-[12px] text-[#2f3643]">{getTenderDisplayTitle(tender)}</div>
+                            <span
+                              className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                              style={{ color: group.accent, backgroundColor: '#ffffff' }}
+                            >
+                              {left}д
+                            </span>
+                          </div>
+
+                          <div className="mt-1 flex items-center justify-between text-[12px]">
+                            <div className="inline-flex items-center gap-1 font-bold" style={{ color: group.accent }}>
+                              <Eye className="h-3.5 w-3.5" />
+                              {formatCurrency(tender.maxprice, tender.currency_code).replace(' RUB', '')}
+                            </div>
+                            <div className="inline-flex items-center gap-1 text-[#8f96a2]">
+                              <Clock3 className="h-3.5 w-3.5" />
+                              {formatDate(tender.enddt)}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </section>
         </div>
       </div>
-
-      
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Wrench, Send, MessageCircleMore, LogOut } from 'lucide-react';
+import { Wrench, Send, MessageCircleMore } from 'lucide-react';
 import { LoginPage } from './components/LoginPage';
 import { Dashboard } from './components/Dashboard';
 import { TenderSearch } from './components/TenderSearch';
@@ -218,14 +218,6 @@ export default function App() {
             </button>
             <button type="button" className="social-btn social-btn--chat" aria-label="Chat">
               <MessageCircleMore className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="inline-flex h-10 items-center gap-2 rounded-2xl border border-[#d0d6df] bg-white px-4 text-[14px] text-[#525b67] hover:bg-[#f7f9fc]"
-            >
-              <LogOut className="h-4 w-4" />
-              Выйти
             </button>
           </div>
         </div>
