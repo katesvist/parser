@@ -37,6 +37,23 @@ function kanbanHint(status?: string) {
   return { text: 'В канбане', color: '#31b06b', kind: 'active' as const };
 }
 
+function favoriteStagePillClass(label: string) {
+  const value = label.toLowerCase();
+  if (value.includes('подача заявок') || value.includes('прием заявок')) {
+    return 'bg-[#e7f8ee] text-[#278f59]';
+  }
+  if (value.includes('работа комиссии')) {
+    return 'bg-[#e8f0ff] text-[#4b72d9]';
+  }
+  if (value.includes('отмен')) {
+    return 'bg-[#fff1f0] text-[#dd6a6a]';
+  }
+  if (value.includes('побед')) {
+    return 'bg-[#f2ebff] text-[#7f58d9]';
+  }
+  return 'bg-[#f1f4f8] text-[#6b7280]';
+}
+
 export function Favorites({ onNavigate }: FavoritesProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('Все статусы');
@@ -310,7 +327,7 @@ export function Favorites({ onNavigate }: FavoritesProps) {
                       {tender.zakon || '—'}
                     </Badge>
                     <span
-                      className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold leading-none ${statusInfo.color}`}
+                      className={`rounded-[8px] px-2 py-[5px] text-[11px] font-semibold leading-none ${favoriteStagePillClass(statusInfo.label)}`}
                     >
                       {statusInfo.label}
                     </span>
