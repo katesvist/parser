@@ -524,7 +524,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
         {resultsError ? <div className="mb-2 rounded-[10px] bg-[#fff4eb] px-3 py-2 text-[14px] text-[#bb5a2c]">{resultsError}</div> : null}
         {resultsLoading ? <div className="mb-2 rounded-[10px] bg-[#f5f7fb] px-3 py-2 text-[14px] text-[#7a8390]">Загружаем данные...</div> : null}
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           {paginatedTenders.map((tender) => {
             const statusInfo = getStatusInfo(tender.etap_zakupki);
             const organization = decodeHtmlEntities(tender.shortname || tender.fullname || '—');
@@ -532,37 +532,40 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
             return (
               <article
                 key={tender.object_number}
-                className="rounded-[12px] border border-[#dde2ea] bg-white p-3 transition hover:bg-[#f8fbff]"
+                className="rounded-[12px] border border-[#e4e8f0] bg-white px-3 py-3 shadow-[0_1px_2px_rgba(16,24,40,0.02)] transition hover:border-[#d8dee8]"
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="min-w-0 flex-1 cursor-pointer" onClick={() => onNavigate('details', tender.object_number)}>
+                  <div className="min-w-0 flex-1 cursor-pointer pr-2" onClick={() => onNavigate('details', tender.object_number)}>
                     <div className="mb-1.5 flex flex-wrap items-center gap-2">
-                      <Badge className="rounded-[5px] bg-[#3e4556] px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-[#3e4556]">
+                      <Badge className="rounded-[5px] bg-[#4b5565] px-1.5 py-0 text-[10px] font-semibold text-white hover:bg-[#4b5565]">
                         {tender.zakon || '—'}
                       </Badge>
-                      <span className="rounded-[5px] bg-[#d7f2e2] px-2 py-0.5 text-[12px] font-bold text-[#20814f]">{statusInfo.label}</span>
-                      <span className="text-[16px] text-[#9aa0ab]">{decodeHtmlEntities(tender.etp_name || '').replace(/^АО /, '').replace(/^ООО /, '') || '—'}</span>
+                      <span className={`rounded-[5px] px-2 py-0 text-[10px] font-semibold ${statusInfo.color}`}>
+                        {statusInfo.label}
+                      </span>
+                      <span className="text-[12px] font-medium text-[#a1a8b4]">{decodeHtmlEntities(tender.etp_name || '').replace(/^АО /, '').replace(/^ООО /, '') || '—'}</span>
                     </div>
-                    <h3 className="line-clamp-2 text-[16px] leading-5 text-[#2d3442]">{getTenderDisplayTitle(tender)}</h3>
-                    <div className="mt-1 text-[14px] text-[#7f8794]">{decodeHtmlEntities(tender.placingway_name || '—')}</div>
-                    <div className="mt-1 text-[24px] font-extrabold leading-7 text-[#2da36b]">
+                    <h3 className="line-clamp-2 text-[16px] leading-[1.35] font-medium text-[#313845]">{getTenderDisplayTitle(tender)}</h3>
+                    <div className="mt-1 text-[14px] text-[#9aa2af]">{decodeHtmlEntities(tender.placingway_name || '—')}</div>
+                    <div className="mt-3 text-[18px] font-extrabold leading-6 text-[#35b26f]">
                       {formatCurrency(tender.maxprice, tender.currency_code).replace(' RUB', '')}
                     </div>
                   </div>
 
-                  <div className="flex min-w-0 flex-row items-end justify-between gap-3 sm:min-w-[230px] lg:block">
+                  <div className="flex min-w-0 flex-row items-start justify-between gap-3 sm:min-w-[235px] lg:min-w-[260px] lg:max-w-[260px]">
                     <button
                       type="button"
-                      className="rounded-[8px] border border-[#d9dee7] p-1.5 text-[#7f8895] hover:bg-[#f4f7fb]"
+                      className="order-2 rounded-[10px] border border-[#d9dee7] p-2 text-[#7f8895] hover:bg-[#f7f9fc] lg:order-none lg:ml-auto"
                       disabled={!favoritesLoaded}
                       onClick={() => toggleFavorite(tender.object_number)}
+                      aria-label="Добавить в избранное"
                     >
-                      <Star className={`h-4 w-4 ${favorites.has(tender.object_number) ? 'fill-[#2da36b] text-[#2da36b]' : ''}`} />
+                      <Bookmark className={`h-4 w-4 ${favorites.has(tender.object_number) ? 'fill-[#35b26f] text-[#35b26f]' : ''}`} />
                     </button>
-                    <div className="mt-2 text-right lg:text-left">
-                      <div className="line-clamp-1 text-[14px] text-[#2f3643]">{organization}</div>
-                      <div className="line-clamp-1 text-[14px] text-[#9aa0ab]">{region || '—'}</div>
-                      <div className="mt-1 inline-flex items-center gap-1 text-[12px] text-[#2f3643]">
+                    <div className="min-w-0 flex-1 pt-0.5 text-right">
+                      <div className="line-clamp-2 text-[14px] font-medium text-[#3d4450]">{organization}</div>
+                      <div className="mt-0.5 line-clamp-1 text-[14px] text-[#a1a8b4]">{region || '—'}</div>
+                      <div className="mt-2 inline-flex items-center gap-1 text-[12px] font-medium text-[#3d4450]">
                         <Calendar className="h-3.5 w-3.5 text-[#8c94a1]" />
                         {formatDate(tender.enddt)} г.
                       </div>
