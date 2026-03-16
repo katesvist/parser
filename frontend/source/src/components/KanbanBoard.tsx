@@ -19,6 +19,12 @@ type KanbanColumn = {
   accent: string;
 };
 
+type AssignmentRow = {
+  object_number: string;
+  specialist_name?: string | null;
+  lawyer_name?: string | null;
+};
+
 const KANBAN_COLUMNS: KanbanColumn[] = [
   { id: 'backlog', label: 'Анализ', accent: '#6f7787' },
   { id: 'in_progress', label: 'Подготовка', accent: '#4c7fdf' },
@@ -35,9 +41,27 @@ function getInitials(value?: string | null) {
   return parts.map((part) => part[0].toUpperCase()).join('');
 }
 
+const SPECIALIST_COLORS = [
+  { bg: '#dceeff', text: '#3b6fc8' },
+  { bg: '#e5f7eb', text: '#2f9e63' },
+  { bg: '#fff0dc', text: '#d97a2f' },
+  { bg: '#f1e6ff', text: '#8b5bd6' },
+  { bg: '#ffe5ea', text: '#d45d7d' },
+  { bg: '#e5f4f3', text: '#2e8d88' },
+];
+
+function getSpecialistAvatarStyle(name?: string | null) {
+  const source = (name || '').trim();
+  if (!source) return SPECIALIST_COLORS[0];
+  const hash = Array.from(source).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return SPECIALIST_COLORS[hash % SPECIALIST_COLORS.length];
+}
+
 export function KanbanBoard({ onNavigate }: KanbanBoardProps) {
   const { tenders, loading, error } = useTenders();
   const [kanbanMap, setKanbanMap] = useState<Record<string, string>>({});
+  const [assignmentMap, setAssignmentMap] = useState<Record<string, string>>({});
+  const [profileSpecialists, setProfileSpecialists] = useState<string[]>([]);
   const [saving, setSaving] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [kanbanDetails, setKanbanDetails] = useState<Record<string, Tender>>({});
@@ -65,6 +89,38 @@ export function KanbanBoard({ onNavigate }: KanbanBoardProps) {
       }
     };
     void load();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadAssignments = async () => {
+      try {
+        const [assignments, profile] = await Promise.all([
+          apiRequest<AssignmentRow[]>('assignments'),
+          apiRequest<{ staff_specialists?: string[] }>('profile'),
+        ]);
+        if (!isMounted) return;
+        const nextAssignments: Record<string, string> = {};
+        (assignments || []).forEach((row) => {
+          const name = (row?.specialist_name || '').trim();
+          if (row?.object_number && name) nextAssignments[row.object_number] = name;
+        });
+        setAssignmentMap(nextAssignments);
+        setProfileSpecialists(
+          Array.isArray(profile?.staff_specialists)
+            ? profile.staff_specialists.filter((value) => typeof value === 'string' && value.trim()).map((value) => value.trim())
+            : [],
+        );
+      } catch {
+        if (!isMounted) return;
+        setAssignmentMap({});
+        setProfileSpecialists([]);
+      }
+    };
+    void loadAssignments();
     return () => {
       isMounted = false;
     };
@@ -318,6 +374,14 @@ export function KanbanBoard({ onNavigate }: KanbanBoardProps) {
                     </div>
                   ) : (
                     (grouped[column.id] || []).map((tender) => (
+                      (() => {
+                        const assignedSpecialist = assignmentMap[tender.object_number];
+                        const showSpecialistAvatar =
+                          column.id !== 'backlog' &&
+                          Boolean(assignedSpecialist) &&
+                          profileSpecialists.includes(assignedSpecialist);
+                        const avatarStyle = getSpecialistAvatarStyle(assignedSpecialist);
+                        return (
                       <article
                         key={tender.object_number}
                         className="rounded-[10px] border border-[#dde3eb] bg-white p-2"
@@ -332,9 +396,15 @@ export function KanbanBoard({ onNavigate }: KanbanBoardProps) {
                           <Badge className="rounded-[5px] bg-[#444b5b] px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-[#444b5b]">
                             {tender.zakon || '—'}
                           </Badge>
-                          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#dbe3ef] text-[10px] font-bold text-[#5f6d85]">
-                            {getInitials(tender.shortname || tender.fullname)}
-                          </div>
+                          {showSpecialistAvatar ? (
+                            <div
+                              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold"
+                              style={{ backgroundColor: avatarStyle.bg, color: avatarStyle.text }}
+                              title={assignedSpecialist}
+                            >
+                              {getInitials(assignedSpecialist)}
+                            </div>
+                          ) : null}
                         </div>
 
                         <button
@@ -377,6 +447,8 @@ export function KanbanBoard({ onNavigate }: KanbanBoardProps) {
                           Перетащите карточку в другую колонку
                         </div>
                       </article>
+                        );
+                      })()
                     ))
                   )}
                 </div>
