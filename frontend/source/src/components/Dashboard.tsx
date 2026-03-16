@@ -552,39 +552,39 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         <div className="min-w-0 space-y-5">
           <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="flex min-h-[108px] flex-col justify-center rounded-[18px] bg-[#d8dee6] px-5 py-5">
-              <div className="text-[14px] font-semibold text-[#2f3542]">Новых за сегодня</div>
-              <div className="mt-1.5 flex items-center justify-between">
+              <div className="mb-[6px] text-[14px] font-semibold text-[#2f3542]">Новых за сегодня</div>
+              <div className="flex items-center justify-between">
                 <div className="text-[20px] leading-none font-medium tracking-[-0.02em] text-[#1d202c]">{newTodayCount}</div>
-                <div className="flex items-center gap-1 text-[13px] text-[#2f3542]">
+                <div className="flex items-center gap-1 text-[9px] text-[#2f3542]">
                   <span>+11.7%</span>
-                  <MoveUpRight className="h-3.5 w-3.5" />
+                  <MoveUpRight className="h-3 w-3" />
                 </div>
               </div>
             </div>
 
             <div className="flex min-h-[108px] flex-col justify-center rounded-[18px] bg-[#d8dee6] px-5 py-5">
-              <div className="text-[14px] font-semibold text-[#2f3542]">Тендеры в канбане</div>
-              <div className="mt-1.5 flex items-center justify-between gap-2">
+              <div className="mb-[6px] text-[14px] font-semibold text-[#2f3542]">Тендеры в канбане</div>
+              <div className="flex items-center justify-between gap-2">
                 <div className="text-[20px] leading-none font-medium tracking-[-0.02em] text-[#1d202c]">{kanbanRows.length}</div>
-                <div className="max-w-[122px] text-right text-[13px] leading-[1.35] text-[#2f3542]">{kanbanNotInWork} из них не в работе</div>
+                <div className="max-w-[122px] text-right text-[9px] leading-[1.3] text-[#2f3542]">{kanbanNotInWork} из них не в работе</div>
               </div>
             </div>
 
             <div className="flex min-h-[108px] flex-col justify-center rounded-[18px] bg-[#d8dee6] px-5 py-5">
-              <div className="text-[14px] font-semibold text-[#2f3542]">Срок подачи &lt;5 дней</div>
-              <div className="mt-1.5 flex items-center justify-between gap-2">
+              <div className="mb-[6px] text-[14px] font-semibold text-[#2f3542]">Срок подачи &lt;5 дней</div>
+              <div className="flex items-center justify-between gap-2">
                 <div className="text-[20px] leading-none font-medium tracking-[-0.02em] text-[#1d202c]">{urgentCount}</div>
-                <div className="max-w-[132px] text-right text-[13px] leading-[1.35] text-[#ef4d1f]">требуют действий!</div>
+                <div className="max-w-[132px] text-right text-[9px] leading-[1.3] text-[#ef4d1f]">требуют действий!</div>
               </div>
             </div>
 
             <div className="flex min-h-[108px] flex-col justify-center rounded-[18px] bg-[#d8dee6] px-5 py-5">
-              <div className="text-[14px] font-semibold text-[#2f3542]">Сумма в работе</div>
-              <div className="mt-1.5 flex items-center justify-between">
+              <div className="mb-[6px] text-[14px] font-semibold text-[#2f3542]">Сумма в работе</div>
+              <div className="flex items-center justify-between">
                 <div className="text-[20px] leading-none font-medium tracking-[-0.02em] text-[#1d202c]">{formatPriceCompact(inWorkAmount)}</div>
-                <div className="flex items-center gap-1 text-[13px] text-[#2f3542]">
+                <div className="flex items-center gap-1 text-[9px] text-[#2f3542]">
                   <span>+8.01%</span>
-                  <MoveUpRight className="h-3.5 w-3.5" />
+                  <MoveUpRight className="h-3 w-3" />
                 </div>
               </div>
             </div>
