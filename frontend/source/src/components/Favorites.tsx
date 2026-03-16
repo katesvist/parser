@@ -284,7 +284,7 @@ export function Favorites({ onNavigate }: FavoritesProps) {
               return (
                 <article
                   key={tender.object_number}
-                  className="rounded-[12px] border border-[#e4e8f0] bg-white px-4 py-3 shadow-[0_1px_2px_rgba(16,24,40,0.02)] transition hover:border-[#d6dde9] hover:bg-[#fbfcfe]"
+                  className="flex h-full min-h-[270px] flex-col rounded-[12px] border border-[#e4e8f0] bg-white px-4 py-3 shadow-[0_1px_2px_rgba(16,24,40,0.02)] transition hover:border-[#d6dde9] hover:bg-[#fbfcfe]"
                 >
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <div className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#4b5565]">
@@ -310,9 +310,9 @@ export function Favorites({ onNavigate }: FavoritesProps) {
                       {tender.zakon || '—'}
                     </Badge>
                     <span
-                      className="rounded-[6px] px-2 py-0.5 text-[10px] font-semibold"
+                      className="rounded-full px-2.5 py-1 text-[10px] font-semibold leading-none"
                       style={{
-                        backgroundColor: statusInfo.color + '20',
+                        backgroundColor: statusInfo.color + '24',
                         color: statusInfo.color,
                       }}
                     >
@@ -321,20 +321,22 @@ export function Favorites({ onNavigate }: FavoritesProps) {
                     <span className="text-[12px] text-[#969dac]">{platformName}</span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => onNavigate('details', tender.object_number)}
-                    className="w-full text-left"
-                  >
-                    <h3 className="line-clamp-2 text-[16px] font-semibold leading-[1.35] text-[#161c27]">
-                      {getTenderDisplayTitle(tender)}
-                    </h3>
-                  </button>
+                  <div className="flex min-h-0 flex-1 flex-col">
+                    <button
+                      type="button"
+                      onClick={() => onNavigate('details', tender.object_number)}
+                      className="w-full text-left"
+                    >
+                      <h3 className="line-clamp-2 text-[16px] font-semibold leading-[1.35] text-[#161c27]">
+                        {getTenderDisplayTitle(tender)}
+                      </h3>
+                    </button>
 
-                  <div className="mt-3 text-[14px] leading-5 text-[#2e3541]">{ownerName}</div>
-                  <div className="mt-1 line-clamp-1 text-[14px] leading-5 text-[#9aa1ae]">{regionName}</div>
+                    <div className="mt-3 text-[14px] leading-5 text-[#2e3541]">{ownerName}</div>
+                    <div className="mt-1 line-clamp-1 text-[14px] leading-5 text-[#9aa1ae]">{regionName}</div>
+                  </div>
 
-                  <div className="mt-4 flex items-end justify-between gap-3">
+                  <div className="mt-4 flex items-end justify-between gap-3 pt-3">
                     <div className="text-[18px] font-extrabold leading-6 text-[#27b26b]">
                       {formatCurrency(tender.maxprice, tender.currency_code).replace(' RUB', '')}
                     </div>
