@@ -26,6 +26,14 @@ type ProfilePayload = {
   staff_lawyers?: string[];
 };
 
+function getUserAvatarInitials(name?: string) {
+  const source = (name || '').trim();
+  if (!source) return 'G';
+  const parts = source.split(/\s+/).filter(Boolean).slice(0, 2);
+  if (!parts.length) return 'G';
+  return parts.map((part) => part.charAt(0).toUpperCase()).join('');
+}
+
 export function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -34,6 +42,7 @@ export function ProfilePage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const apiBase = (import.meta.env.VITE_API_BASE as string | undefined) ?? '/api';
+  const avatarInitials = getUserAvatarInitials(profile.user_name);
 
   useEffect(() => {
     let isMounted = true;
@@ -144,13 +153,15 @@ export function ProfilePage() {
               <form className="space-y-6" onSubmit={handleSave}>
                 <div className="flex items-center gap-4">
                   <Avatar className="w-16 h-16">
-                    <AvatarFallback className="text-xl">ИИ</AvatarFallback>
+                    <AvatarFallback className="bg-[#e8eefc] text-xl font-semibold text-[#3e6fd8]">
+                      {avatarInitials}
+                    </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="text-base font-medium text-foreground">
                       {profile.user_name || 'Пользователь'}
                     </p>
-                    <p className="text-sm text-muted-foreground">Роль: {profile.role || 'user'}</p>
+                    <p className="text-sm text-muted-foreground">{profile.email || '—'}</p>
                   </div>
                 </div>
 
@@ -163,9 +174,22 @@ export function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
+                    <Label htmlFor="user_name">Имя пользователя</Label>
+                    <Input
+                      id="user_name"
+                      type="text"
+                      placeholder="Например, Георгий"
+                      value={profile.user_name || ''}
+                      onChange={(e) => updateField('user_name', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" value={profile.email || ''} readOnly />
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="phone">Телефон</Label>
                     <Input
@@ -179,7 +203,11 @@ export function ProfilePage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Button type="submit" disabled={isSaving}>
+                  <Button
+                    type="submit"
+                    disabled={isSaving}
+                    className="bg-[#3e6fd8] text-white hover:bg-[#355fc0]"
+                  >
                     {isSaving ? 'Сохраняем...' : 'Сохранить'}
                   </Button>
                   {saveMessage ? (
@@ -296,7 +324,11 @@ export function ProfilePage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Button type="submit" disabled={isSaving}>
+                  <Button
+                    type="submit"
+                    disabled={isSaving}
+                    className="bg-[#3e6fd8] text-white hover:bg-[#355fc0]"
+                  >
                     {isSaving ? 'Сохраняем...' : 'Сохранить'}
                   </Button>
                   {saveMessage ? (
