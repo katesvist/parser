@@ -9,12 +9,11 @@ import {
   Users,
   LineChart,
   FileText,
-  PlusCircle,
   LogOut,
 } from 'lucide-react';
 
 interface HeaderProps {
-  onNavigate: (page: 'dashboard' | 'search' | 'kanban' | 'profile' | 'saved-searches' | 'favorites') => void;
+  onNavigate: (page: 'dashboard' | 'search' | 'kanban' | 'profile' | 'saved-searches' | 'favorites' | 'team') => void;
   onLogout: () => void;
   currentPage: string;
   userName?: string;
@@ -36,13 +35,12 @@ const navItems = [
   { id: 'favorites', label: 'Избранное', icon: Star },
   { id: 'kanban', label: 'Канбан', icon: Columns3 },
   { id: 'saved-searches', label: 'Сохраненные поиски', icon: BookmarkCheck },
-  { id: 'team', label: 'Команда', icon: Users, disabled: true },
+  { id: 'team', label: 'Команда', icon: Users },
 ] as const;
 
 const moduleItems = [
   { id: 'market', label: 'Анализ рынка', icon: LineChart },
   { id: 'docs', label: 'Документы', icon: FileText },
-  { id: 'other', label: 'Еще что-нибудь', icon: PlusCircle },
 ] as const;
 
 export function Header({ onNavigate, onLogout, currentPage, userName }: HeaderProps) {
@@ -52,7 +50,7 @@ export function Header({ onNavigate, onLogout, currentPage, userName }: HeaderPr
   return (
     <>
       <aside className="hidden w-[223px] shrink-0 flex-col rounded-xl bg-[#cfd6de] p-3 md:mb-3 md:ml-3 md:mt-3 md:flex md:h-[calc(100vh-24px)] md:self-start md:sticky md:top-3">
-        <div className="mb-5 rounded-xl bg-[#bcc6d2] px-3 py-3">
+        <div className="mb-5 px-3 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[10px] font-bold text-[#1d202c]">
               Tender

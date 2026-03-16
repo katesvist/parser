@@ -11,10 +11,11 @@ import { Favorites } from './components/Favorites';
 import { Header } from './components/Header';
 import { PageSection } from './components/PageSection';
 import { OnboardingModal, type OnboardingProfile } from './components/OnboardingModal';
+import { TeamPage } from './components/TeamPage';
 import { clearSession, isSessionValid, loadSession } from './lib/auth';
 import { apiRequest } from './lib/api';
 
-type Page = 'login' | 'dashboard' | 'search' | 'details' | 'kanban' | 'profile' | 'saved-searches' | 'favorites';
+type Page = 'login' | 'dashboard' | 'search' | 'details' | 'kanban' | 'profile' | 'saved-searches' | 'favorites' | 'team';
 
 function extractFirstName(fullName: string) {
   const normalized = (fullName || '').trim();
@@ -38,7 +39,7 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const page = params.get('page') as Page | null;
     const tenderId = params.get('tender') || null;
-    if (page && ['dashboard', 'search', 'details', 'kanban', 'profile', 'saved-searches', 'favorites'].includes(page)) {
+    if (page && ['dashboard', 'search', 'details', 'kanban', 'profile', 'saved-searches', 'favorites', 'team'].includes(page)) {
       return { page, tenderId };
     }
     return { page: 'dashboard' as Page, tenderId: null };
@@ -169,6 +170,8 @@ export default function App() {
         return <SavedSearches onNavigate={handleNavigate} />;
       case 'favorites':
         return <Favorites onNavigate={handleNavigate} />;
+      case 'team':
+        return <TeamPage />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }

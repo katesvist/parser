@@ -80,14 +80,6 @@ export function ProfilePage() {
     setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
-  const updateListField = (field: 'staff_specialists' | 'staff_lawyers', value: string) => {
-    const items = value
-      .split(/\n|,/)
-      .map((item) => item.trim())
-      .filter(Boolean);
-    setProfile((prev) => ({ ...prev, [field]: items }));
-  };
-
   const handleSave = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
     setSaveMessage(null);
@@ -291,28 +283,6 @@ export function ProfilePage() {
                     value={profile.keywords || ''}
                     onChange={(e) => updateField('keywords', e.target.value)}
                   />
-                </div>
-
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="staff_specialists">Специалисты (1 строка = 1 сотрудник)</Label>
-                    <Textarea
-                      id="staff_specialists"
-                      placeholder="Иванов Иван\nПетров Петр"
-                      value={(profile.staff_specialists || []).join('\n')}
-                      onChange={(e) => updateListField('staff_specialists', e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="staff_lawyers">Юристы (1 строка = 1 сотрудник)</Label>
-                    <Textarea
-                      id="staff_lawyers"
-                      placeholder="Сидорова Анна\nКузнецов Дмитрий"
-                      value={(profile.staff_lawyers || []).join('\n')}
-                      onChange={(e) => updateListField('staff_lawyers', e.target.value)}
-                    />
-                  </div>
                 </div>
 
                 <div className="space-y-2">
