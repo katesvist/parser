@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { Star, Trash2, Calendar, Download, CircleDot } from 'lucide-react';
+import { Star, Trash2, Calendar, Download, CircleAlert, CircleCheckBig } from 'lucide-react';
 import { useTenders } from '../context/TendersContext';
 import { downloadJson } from '../utils/download';
 import {
@@ -29,12 +29,12 @@ interface FavoritesProps {
 
 function kanbanHint(status?: string) {
   const value = (status || '').toLowerCase();
-  if (!value) return { text: 'Не в работе', color: '#e29a57' };
-  if (value.includes('done') || value.includes('заверш')) return { text: 'Завершено', color: '#5f88d2' };
+  if (!value) return { text: 'Не в работе', color: '#e29a57', kind: 'idle' as const };
+  if (value.includes('done') || value.includes('заверш')) return { text: 'В канбане', color: '#31b06b', kind: 'active' as const };
   if (value.includes('in_progress') || value.includes('docs') || value.includes('review')) {
-    return { text: 'В канбане', color: '#31b06b' };
+    return { text: 'В канбане', color: '#31b06b', kind: 'active' as const };
   }
-  return { text: 'В канбане', color: '#31b06b' };
+  return { text: 'В канбане', color: '#31b06b', kind: 'active' as const };
 }
 
 export function Favorites({ onNavigate }: FavoritesProps) {
@@ -276,32 +276,49 @@ export function Favorites({ onNavigate }: FavoritesProps) {
             {filteredFavorites.map((tender) => {
               const statusInfo = getStatusInfo(tender.etap_zakupki);
               const workState = kanbanHint(kanbanMap[tender.object_number]);
+              const platformName = decodeHtmlEntities(tender.etp_name || '')
+                .replace(/^АО /, '')
+                .replace(/^ООО /, '') || '—';
+              const ownerName = decodeHtmlEntities(tender.shortname || tender.fullname || '—');
+              const regionName = decodeHtmlEntities(((tender as any).region_name || (tender as any).region || '').toString()) || '—';
               return (
                 <article
                   key={tender.object_number}
-                  className="rounded-[12px] border border-[#dde2ea] bg-white p-3 transition hover:bg-[#f8fbff]"
+                  className="rounded-[12px] border border-[#e4e8f0] bg-white px-4 py-3 shadow-[0_1px_2px_rgba(16,24,40,0.02)] transition hover:border-[#d6dde9] hover:bg-[#fbfcfe]"
                 >
-                  <div className="mb-1 flex items-center justify-between gap-2">
-                    <div className="inline-flex items-center gap-1 text-[12px] text-[#7a8390]">
-                      <CircleDot className="h-3.5 w-3.5" style={{ color: workState.color }} />
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#4b5565]">
+                      {workState.kind === 'active' ? (
+                        <CircleCheckBig className="h-3.5 w-3.5 shrink-0" style={{ color: workState.color }} />
+                      ) : (
+                        <CircleAlert className="h-3.5 w-3.5 shrink-0" style={{ color: workState.color }} />
+                      )}
                       {workState.text}
                     </div>
                     <button
                       type="button"
                       onClick={() => toggleFavorite(tender.object_number)}
-                      className="rounded-[8px] p-1 text-[#ea6f76] hover:bg-[#fff1f3]"
+                      className="rounded-[8px] p-1 text-[#ea6f76] transition hover:bg-[#fff1f3]"
                       aria-label="Удалить из избранного"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
 
-                  <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <Badge className="rounded-[5px] bg-[#3e4556] px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-[#3e4556]">
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <Badge className="rounded-[6px] bg-[#444c5c] px-2 py-0.5 text-[10px] font-semibold tracking-[0.01em] text-white hover:bg-[#444c5c]">
                       {tender.zakon || '—'}
                     </Badge>
-                    <span className="rounded-[5px] bg-[#d7f2e2] px-2 py-0.5 text-[12px] font-bold text-[#20814f]">{statusInfo.label}</span>
-                    <span className="text-[16px] text-[#9aa0ab]">{decodeHtmlEntities(tender.etp_name || '').replace(/^АО /, '').replace(/^ООО /, '') || '—'}</span>
+                    <span
+                      className="rounded-[6px] px-2 py-0.5 text-[10px] font-semibold"
+                      style={{
+                        backgroundColor: statusInfo.color + '20',
+                        color: statusInfo.color,
+                      }}
+                    >
+                      {statusInfo.label}
+                    </span>
+                    <span className="text-[12px] text-[#969dac]">{platformName}</span>
                   </div>
 
                   <button
@@ -309,37 +326,22 @@ export function Favorites({ onNavigate }: FavoritesProps) {
                     onClick={() => onNavigate('details', tender.object_number)}
                     className="w-full text-left"
                   >
-                    <h3 className="line-clamp-2 text-[14px] font-semibold leading-5 text-[#2d3442]">{getTenderDisplayTitle(tender)}</h3>
+                    <h3 className="line-clamp-2 text-[16px] font-semibold leading-[1.35] text-[#161c27]">
+                      {getTenderDisplayTitle(tender)}
+                    </h3>
                   </button>
 
-                  <div className="mt-1 text-[14px] text-[#2f3643]">{decodeHtmlEntities(tender.shortname || tender.fullname || '—')}</div>
-                  <div className="line-clamp-1 text-[14px] text-[#9aa0ab]">{decodeHtmlEntities(((tender as any).region_name || (tender as any).region || '').toString()) || '—'}</div>
+                  <div className="mt-3 text-[14px] leading-5 text-[#2e3541]">{ownerName}</div>
+                  <div className="mt-1 line-clamp-1 text-[14px] leading-5 text-[#9aa1ae]">{regionName}</div>
 
-                  <div className="mt-2 flex items-center justify-between">
-                    <div className="text-[24px] font-extrabold leading-7 text-[#2da36b]">
+                  <div className="mt-4 flex items-end justify-between gap-3">
+                    <div className="text-[18px] font-extrabold leading-6 text-[#27b26b]">
                       {formatCurrency(tender.maxprice, tender.currency_code).replace(' RUB', '')}
                     </div>
-                    <div className="inline-flex items-center gap-1 text-[12px] text-[#2f3643]">
-                      <Calendar className="h-3.5 w-3.5 text-[#8c94a1]" />
+                    <div className="inline-flex shrink-0 items-center gap-1 text-[12px] text-[#2f3643]">
+                      <Calendar className="h-3.5 w-3.5 text-[#8f96a4]" />
                       {formatDate(tender.enddt)} г.
                     </div>
-                  </div>
-
-                  <div className="mt-2 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => onNavigate('details', tender.object_number)}
-                      className="text-[12px] font-semibold text-[#3b6fc8] hover:text-[#2e5ca7]"
-                    >
-                      Открыть
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toggleFavorite(tender.object_number)}
-                      className="rounded-[8px] border border-[#d9dee7] p-1.5 text-[#7f8895] hover:bg-[#f4f7fb]"
-                    >
-                      <Star className={`h-4 w-4 ${favorites.has(tender.object_number) ? 'fill-[#2da36b] text-[#2da36b]' : ''}`} />
-                    </button>
                   </div>
                 </article>
               );
