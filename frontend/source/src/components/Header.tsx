@@ -51,7 +51,7 @@ export function Header({ onNavigate, onLogout, currentPage, userName }: HeaderPr
 
   return (
     <>
-      <aside className="hidden w-[223px] shrink-0 flex-col rounded-xl bg-[#cfd6de] p-3 md:mb-3 md:ml-3 md:mr-3 md:mt-3 md:flex md:h-[calc(100vh-24px)] md:self-start md:sticky md:top-3">
+      <aside className="hidden w-[223px] shrink-0 flex-col rounded-xl bg-[#cfd6de] p-3 md:mb-3 md:ml-3 md:mt-3 md:flex md:h-[calc(100vh-24px)] md:self-start md:sticky md:top-3">
         <div className="mb-5 rounded-xl bg-[#bcc6d2] px-3 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[10px] font-bold text-[#1d202c]">
