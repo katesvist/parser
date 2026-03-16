@@ -310,11 +310,7 @@ export function Favorites({ onNavigate }: FavoritesProps) {
                       {tender.zakon || '—'}
                     </Badge>
                     <span
-                      className="rounded-full px-2.5 py-1 text-[10px] font-semibold leading-none"
-                      style={{
-                        backgroundColor: statusInfo.color + '24',
-                        color: statusInfo.color,
-                      }}
+                      className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold leading-none ${statusInfo.color}`}
                     >
                       {statusInfo.label}
                     </span>
