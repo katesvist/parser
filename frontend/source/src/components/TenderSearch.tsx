@@ -44,6 +44,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [favoritesLoaded, setFavoritesLoaded] = useState(false);
   const [lawFilter, setLawFilter] = useState('Все законы');
+  const [regionFilter, setRegionFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('Все статусы');
   const [methodFilter, setMethodFilter] = useState('Все способы');
   const [okpd2Filter, setOkpd2Filter] = useState('');
@@ -99,6 +100,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
       setSearchInput(payload.search);
       setSearchQuery(payload.search);
       setLawFilter(payload.law || 'Все законы');
+      setRegionFilter(payload.region || '');
       setStatusFilter(payload.status || 'Все статусы');
       setMethodFilter(payload.method || 'Все способы');
       setOkpd2Filter(payload.okpd2);
@@ -151,6 +153,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
     setSearchInput('');
     setSearchQuery('');
     setLawFilter('Все законы');
+    setRegionFilter('');
     setStatusFilter('Все статусы');
     setMethodFilter('Все способы');
     setOkpd2Filter('');
@@ -208,6 +211,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
     const filters = {
       search: searchQuery,
       law: lawFilter,
+      region: regionFilter,
       status: statusFilter,
       method: methodFilter,
       okpd2: okpd2Filter,
@@ -234,6 +238,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
   }, [
     searchQuery,
     lawFilter,
+    regionFilter,
     statusFilter,
     methodFilter,
     okpd2Filter,
@@ -286,6 +291,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
   }, [
     searchQuery,
     lawFilter,
+    regionFilter,
     statusFilter,
     methodFilter,
     okpd2Filter,
@@ -313,6 +319,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
         params.set('limit', String(PAGE_SIZE));
         if (searchQuery) params.set('search', searchQuery);
         if (lawFilter !== 'Все законы') params.set('fz', lawFilter);
+        if (regionFilter.trim()) params.set('region', regionFilter.trim());
         if (statusFilter !== 'Все статусы') params.set('stage', statusFilter);
         if (methodFilter !== 'Все способы') params.set('procedure_type', methodFilter);
         if (okpd2Filter.trim()) params.set('okpd2', okpd2Filter.trim());
@@ -347,6 +354,7 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
     currentPage,
     searchQuery,
     lawFilter,
+    regionFilter,
     statusFilter,
     methodFilter,
     okpd2Filter,
@@ -371,12 +379,12 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
   return (
     <div className="space-y-4">
       <section className="surface-card p-4 md:p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[24px] leading-7 font-extrabold text-[#303744]">Параметры поиска</h2>
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <h2 className="text-[20px] leading-6 font-extrabold text-[#111827]">Параметры поиска</h2>
           <button
             type="button"
             onClick={() => setIsFilterOpen((prev) => !prev)}
-            className="inline-flex items-center gap-2 text-[14px] font-semibold text-[#3f4652]"
+            className="inline-flex items-center gap-2 text-[14px] font-semibold text-[#1f2937]"
           >
             <Filter className="h-4 w-4" />
             Фильтры
@@ -384,115 +392,119 @@ export function TenderSearch({ onNavigate }: TenderSearchProps) {
           </button>
         </div>
 
-        <form className="mb-3 flex flex-wrap gap-2" onSubmit={handleSearchSubmit}>
-          <div className="flex-1 basis-full sm:min-w-[240px]">
-            <Input
-              placeholder="Поиск по ключевым словам..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="h-11 rounded-[10px] border-[#d8dee6] bg-white text-[18px]"
-              enterKeyHint="search"
-            />
-          </div>
-          <Button
-            type="button"
-            className={`h-11 rounded-[10px] bg-[#2da36b] px-5 text-[14px] font-bold text-white hover:bg-[#248e5c] ${searchAnimating ? 'scale-[0.99]' : ''}`}
-            onClick={runSearch}
-          >
-            <Search className="mr-2 h-4 w-4" />
-            Найти
-          </Button>
-          <Button type="button" variant="outline" className="h-11 rounded-[10px] border-[#d8dee6] px-4 text-[14px] text-[#2f3542]" onClick={saveSearch}>
-            <Bookmark className="mr-2 h-4 w-4" />
-            Сохранить поиск
-          </Button>
-          <Button type="button" variant="outline" className="h-11 rounded-[10px] border-[#d8dee6] px-4 text-[14px] text-[#2f3542]" onClick={resetFilters}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Сбросить поиск
-          </Button>
-        </form>
-
-        <Collapsible open={isFilterOpen}>
-          <CollapsibleContent>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">Закон</Label>
-                <Select value={lawFilter} onValueChange={setLawFilter}>
-                  <SelectTrigger className="h-11 rounded-[10px] border-[#d8dee6] bg-white"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {laws.map((law) => (
-                      <SelectItem key={law} value={law}>{law}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">Способ закупки</Label>
-                <Select value={methodFilter} onValueChange={setMethodFilter}>
-                  <SelectTrigger className="h-11 rounded-[10px] border-[#d8dee6] bg-white"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {purchaseMethods.map((method) => (
-                      <SelectItem key={method} value={method}>{method}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">Дата публикации от</Label>
-                <Input type="date" value={startDateFrom} onChange={(e) => setStartDateFrom(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">Цена от (₽)</Label>
-                <Input type="number" placeholder="0" value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">Цена до (₽)</Label>
-                <Input type="number" placeholder="0" value={priceTo} onChange={(e) => setPriceTo(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">ОКПД</Label>
-                <Input placeholder="Например, 20.41" value={okpd2Filter} onChange={(e) => setOkpd2Filter(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">Номер закупки</Label>
-                <Input placeholder="Например, 0123200000326000116" value={objectNumberFilter} onChange={(e) => setObjectNumberFilter(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">ИНН заказчика</Label>
-                <Input placeholder="Например, 7701234567" value={innFilter} onChange={(e) => setInnFilter(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">ИКЗ</Label>
-                <Input value={ikzFilter} onChange={(e) => setIkzFilter(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">Финальная дата подачи заявок</Label>
-                <Input type="date" value={endDateTo} onChange={(e) => setEndDateTo(e.target.value)} className="h-11 rounded-[10px] border-[#d8dee6] bg-white" />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-[16px] text-[#3f4652]">Этап закупки</Label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="h-11 rounded-[10px] border-[#d8dee6] bg-white"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {statuses.map((status) => (
-                      <SelectItem key={status} value={status}>{status}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+        <form className="mb-4" onSubmit={handleSearchSubmit}>
+          <div className="flex flex-wrap items-center gap-2 border-b border-[#e5e7eb] pb-4">
+            <div className="min-w-[320px] flex-1 basis-[420px]">
+              <Input
+                placeholder="Поиск по ключевым словам..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px] placeholder:text-[#a0a8b5]"
+                enterKeyHint="search"
+              />
             </div>
-          </CollapsibleContent>
-        </Collapsible>
+            <Button
+              type="button"
+              className={`h-9 rounded-[10px] bg-[#2da36b] px-5 text-[14px] font-semibold text-white hover:bg-[#248e5c] ${searchAnimating ? 'scale-[0.99]' : ''}`}
+              onClick={runSearch}
+            >
+              <Search className="mr-2 h-4 w-4" />
+              Найти
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px] font-medium text-[#2f3542]"
+              onClick={saveSearch}
+            >
+              <Bookmark className="mr-2 h-4 w-4" />
+              Сохранить поиск
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px] font-medium text-[#2f3542]"
+              onClick={resetFilters}
+            >
+              <Bookmark className="mr-2 h-4 w-4" />
+              Сбросить поиск
+            </Button>
+          </div>
+
+          <Collapsible open={isFilterOpen}>
+            <CollapsibleContent>
+              <div className="grid grid-cols-1 gap-x-6 gap-y-3 pt-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">Закон</Label>
+                  <Select value={lawFilter} onValueChange={setLawFilter}>
+                    <SelectTrigger className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {laws.map((law) => (
+                        <SelectItem key={law} value={law}>{law}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">Регион</Label>
+                  <Input
+                    value={regionFilter}
+                    onChange={(e) => setRegionFilter(e.target.value)}
+                    className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">Способ закупки</Label>
+                  <Select value={methodFilter} onValueChange={setMethodFilter}>
+                    <SelectTrigger className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {purchaseMethods.map((method) => (
+                        <SelectItem key={method} value={method}>{method}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">Дата публикации от</Label>
+                  <Input type="date" value={startDateFrom} onChange={(e) => setStartDateFrom(e.target.value)} className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">Цена от (₽)</Label>
+                  <Input type="number" placeholder="0" value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">Цена до (₽)</Label>
+                  <Input type="number" placeholder="0" value={priceTo} onChange={(e) => setPriceTo(e.target.value)} className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">ОКПД</Label>
+                  <Input placeholder="" value={okpd2Filter} onChange={(e) => setOkpd2Filter(e.target.value)} className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">Номер закупки</Label>
+                  <Input placeholder="" value={objectNumberFilter} onChange={(e) => setObjectNumberFilter(e.target.value)} className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">ИНН заказчика</Label>
+                  <Input placeholder="0" value={innFilter} onChange={(e) => setInnFilter(e.target.value)} className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[15px] font-medium text-[#2f3542]">ИКЗ</Label>
+                  <Input placeholder="0" value={ikzFilter} onChange={(e) => setIkzFilter(e.target.value)} className="h-9 rounded-[10px] border-[#d9dee7] bg-white px-4 text-[14px]" />
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </form>
       </section>
 
       <section className="surface-card p-4 md:p-5">
