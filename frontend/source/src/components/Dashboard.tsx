@@ -551,35 +551,35 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,901px)_330px]">
         <div className="min-w-0 space-y-5">
           <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="soft-card px-5 py-4">
-              <div className="text-[14px] font-bold text-[#3d4350]">Новых за сегодня</div>
+            <div className="rounded-[24px] bg-[#d8dee6] px-5 py-5 shadow-[inset_0_0_0_1px_rgba(182,191,203,0.32)]">
+              <div className="text-[15px] font-semibold text-[#2f3542]">Новых за сегодня</div>
               <div className="mt-2 flex items-end justify-between">
-                <div className="text-[34px] leading-[1.05] font-extrabold text-[#1d202c]">{newTodayCount}</div>
-                <div className="text-[12px] text-[#6b7280]">+11.7%</div>
+                <div className="text-[42px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#1d202c]">{newTodayCount}</div>
+                <div className="text-[12px] text-[#5f6775]">+11.7%</div>
               </div>
             </div>
 
-            <div className="soft-card px-5 py-4">
-              <div className="text-[14px] font-bold text-[#3d4350]">Тендеры в канбане</div>
+            <div className="rounded-[24px] bg-[#d8dee6] px-5 py-5 shadow-[inset_0_0_0_1px_rgba(182,191,203,0.32)]">
+              <div className="text-[15px] font-semibold text-[#2f3542]">Тендеры в канбане</div>
               <div className="mt-2 flex items-end justify-between gap-2">
-                <div className="text-[34px] leading-[1.05] font-extrabold text-[#1d202c]">{kanbanRows.length}</div>
-                <div className="text-right text-[12px] leading-4 text-[#6b7280]">{kanbanNotInWork} из них не в работе</div>
+                <div className="text-[42px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#1d202c]">{kanbanRows.length}</div>
+                <div className="text-right text-[12px] leading-4 text-[#4f5561]">{kanbanNotInWork} из них не в работе</div>
               </div>
             </div>
 
-            <div className="soft-card px-5 py-4">
-              <div className="text-[14px] font-bold text-[#3d4350]">Срок подачи &lt;5 дней</div>
+            <div className="rounded-[24px] bg-[#d8dee6] px-5 py-5 shadow-[inset_0_0_0_1px_rgba(182,191,203,0.32)]">
+              <div className="text-[15px] font-semibold text-[#2f3542]">Срок подачи &lt;5 дней</div>
               <div className="mt-2 flex items-end justify-between gap-2">
-                <div className="text-[34px] leading-[1.05] font-extrabold text-[#1d202c]">{urgentCount}</div>
+                <div className="text-[42px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#1d202c]">{urgentCount}</div>
                 <div className="text-right text-[12px] leading-4 text-[#ef4d1f]">требуют действий!</div>
               </div>
             </div>
 
-            <div className="soft-card px-5 py-4">
-              <div className="text-[14px] font-bold text-[#3d4350]">Сумма в работе</div>
+            <div className="rounded-[24px] bg-[#d8dee6] px-5 py-5 shadow-[inset_0_0_0_1px_rgba(182,191,203,0.32)]">
+              <div className="text-[15px] font-semibold text-[#2f3542]">Сумма в работе</div>
               <div className="mt-2 flex items-end justify-between">
-                <div className="text-[34px] leading-[1.05] font-extrabold text-[#1d202c]">{formatPriceCompact(inWorkAmount)}</div>
-                <div className="text-[12px] text-[#6b7280]">+8.01%</div>
+                <div className="text-[42px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#1d202c]">{formatPriceCompact(inWorkAmount)}</div>
+                <div className="text-[12px] text-[#5f6775]">+8.01%</div>
               </div>
             </div>
           </section>
