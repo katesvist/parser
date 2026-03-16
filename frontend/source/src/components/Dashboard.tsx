@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertCircle, ArrowRight, Clock3, Eye, Sparkles } from 'lucide-react';
+import { AlertCircle, ArrowRight, Clock3, Eye, MoveUpRight, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { useTenders } from '../context/TendersContext';
@@ -551,35 +551,41 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,901px)_330px]">
         <div className="min-w-0 space-y-5">
           <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-[24px] bg-[#d8dee6] px-5 py-5 shadow-[inset_0_0_0_1px_rgba(182,191,203,0.32)]">
+            <div className="min-h-[108px] rounded-[18px] bg-[#d8dee6] px-5 py-5">
               <div className="text-[15px] font-semibold text-[#2f3542]">Новых за сегодня</div>
               <div className="mt-2 flex items-end justify-between">
-                <div className="text-[42px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#1d202c]">{newTodayCount}</div>
-                <div className="text-[12px] text-[#5f6775]">+11.7%</div>
+                <div className="text-[32px] leading-none font-medium tracking-[-0.02em] text-[#1d202c]">{newTodayCount}</div>
+                <div className="flex items-center gap-1 text-[13px] text-[#2f3542]">
+                  <span>+11.7%</span>
+                  <MoveUpRight className="h-3.5 w-3.5" />
+                </div>
               </div>
             </div>
 
-            <div className="rounded-[24px] bg-[#d8dee6] px-5 py-5 shadow-[inset_0_0_0_1px_rgba(182,191,203,0.32)]">
+            <div className="min-h-[108px] rounded-[18px] bg-[#d8dee6] px-5 py-5">
               <div className="text-[15px] font-semibold text-[#2f3542]">Тендеры в канбане</div>
               <div className="mt-2 flex items-end justify-between gap-2">
-                <div className="text-[42px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#1d202c]">{kanbanRows.length}</div>
-                <div className="text-right text-[12px] leading-4 text-[#4f5561]">{kanbanNotInWork} из них не в работе</div>
+                <div className="text-[32px] leading-none font-medium tracking-[-0.02em] text-[#1d202c]">{kanbanRows.length}</div>
+                <div className="max-w-[122px] text-right text-[13px] leading-[1.35] text-[#2f3542]">{kanbanNotInWork} из них не в работе</div>
               </div>
             </div>
 
-            <div className="rounded-[24px] bg-[#d8dee6] px-5 py-5 shadow-[inset_0_0_0_1px_rgba(182,191,203,0.32)]">
+            <div className="min-h-[108px] rounded-[18px] bg-[#d8dee6] px-5 py-5">
               <div className="text-[15px] font-semibold text-[#2f3542]">Срок подачи &lt;5 дней</div>
               <div className="mt-2 flex items-end justify-between gap-2">
-                <div className="text-[42px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#1d202c]">{urgentCount}</div>
-                <div className="text-right text-[12px] leading-4 text-[#ef4d1f]">требуют действий!</div>
+                <div className="text-[32px] leading-none font-medium tracking-[-0.02em] text-[#1d202c]">{urgentCount}</div>
+                <div className="max-w-[132px] text-right text-[13px] leading-[1.35] text-[#ef4d1f]">требуют действий!</div>
               </div>
             </div>
 
-            <div className="rounded-[24px] bg-[#d8dee6] px-5 py-5 shadow-[inset_0_0_0_1px_rgba(182,191,203,0.32)]">
+            <div className="min-h-[108px] rounded-[18px] bg-[#d8dee6] px-5 py-5">
               <div className="text-[15px] font-semibold text-[#2f3542]">Сумма в работе</div>
               <div className="mt-2 flex items-end justify-between">
-                <div className="text-[42px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#1d202c]">{formatPriceCompact(inWorkAmount)}</div>
-                <div className="text-[12px] text-[#5f6775]">+8.01%</div>
+                <div className="text-[32px] leading-none font-medium tracking-[-0.02em] text-[#1d202c]">{formatPriceCompact(inWorkAmount)}</div>
+                <div className="flex items-center gap-1 text-[13px] text-[#2f3542]">
+                  <span>+8.01%</span>
+                  <MoveUpRight className="h-3.5 w-3.5" />
+                </div>
               </div>
             </div>
           </section>
